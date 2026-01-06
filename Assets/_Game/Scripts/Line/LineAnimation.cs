@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 public class LineAnimation : MonoBehaviour
 {
     [SerializeField] private LineRenderer line;
-    [SerializeField] private float speed = 5f; // speed along the path
+    [SerializeField] private float speed = 5f;
 
     public bool play;
     public bool forward = true;
@@ -14,7 +14,11 @@ public class LineAnimation : MonoBehaviour
 
     private void Start()
     {
+        if (line == null) return;
+        
         var count = line.positionCount;
+        if (count < 2) return;
+        
         positionsOrigin = new Vector3[count];
         for (int i = 0; i < count; i++)
         {
@@ -27,6 +31,9 @@ public class LineAnimation : MonoBehaviour
 
     public void Play(bool forwardDirection)
     {
+        if (line == null || line.positionCount < 2)
+            return;
+        
         forward = forwardDirection;
         play = true;
     }
@@ -36,7 +43,10 @@ public class LineAnimation : MonoBehaviour
         if (!play) return;
 
         if (!line || line.positionCount < 2)
+        {
+            play = false;
             return;
+        }
 
         if (forward)
             AnimateForward();
@@ -59,7 +69,6 @@ public class LineAnimation : MonoBehaviour
 
         if (!(Vector3.Distance(tailPoint, line.GetPosition(1)) < 0.1f)) return;
 
-        // delete the first point
         var newCount = count - 1;
         var newPositions = new Vector3[newCount];
         for (int i = 1; i < count; i++)
@@ -86,7 +95,7 @@ public class LineAnimation : MonoBehaviour
             return;
         }
 
-        var positionHeadOrigin = positionsOrigin[positionsOrigin.Length - 1]; // using index ^1 logic from image
+        var positionHeadOrigin = positionsOrigin[positionsOrigin.Length - 1];
         var indexHead = countCurrent - 1;
         var positionHead = line.GetPosition(indexHead);
 
@@ -111,7 +120,6 @@ public class LineAnimation : MonoBehaviour
         if (Vector3.Distance(positionTail, positionsOrigin[indexTarget]) >= 0.1f)
             return;
 
-        // add point back
         var newCount = countCurrent + 1;
         var newPositions = new Vector3[newCount];
 

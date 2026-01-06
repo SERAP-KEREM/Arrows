@@ -5,14 +5,22 @@ public class LineSegmentColliderSpawner2D : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private LineRenderer lineRenderer;
-    [SerializeField] private GameObject segmentPrefab; // MUST have BoxCollider2D
+    [SerializeField] private GameObject segmentPrefab;
 
     [Header("Collider Settings")]
-    [SerializeField] private float thickness = 0.2f; // collider height
-    [SerializeField] private float extraLenght = 0.2f; // collider width extension
+    [SerializeField] private float thickness = 0.2f;
+    [SerializeField] private float extraLenght = 0.2f;
     [SerializeField] private bool autoUpdateInPlayMode = true;
 
     private readonly List<GameObject> _spawnedSegments = new();
+
+    private void Start()
+    {
+        if (autoUpdateInPlayMode && Application.isPlaying)
+        {
+            RebuildSegments();
+        }
+    }
 
     [ContextMenu("Rebuild Segment Colliders")]
     private void RebuildSegmentsContextMenu()
@@ -38,13 +46,11 @@ public class LineSegmentColliderSpawner2D : MonoBehaviour
 
         for (int i = 0; i < count - 1; i++)
         {
-            // Get segment endpoints
             Vector3 a = lineRenderer.GetPosition(i);
             Vector3 b = lineRenderer.GetPosition(i + 1);
 
             if (!useWorld)
             {
-                // Convert from local to world if LineRenderer is local
                 a = lineRenderer.transform.TransformPoint(a);
                 b = lineRenderer.transform.TransformPoint(b);
             }
@@ -52,23 +58,25 @@ public class LineSegmentColliderSpawner2D : MonoBehaviour
             Vector3 dir = b - a;
             float length = dir.magnitude;
 
-            // Instantiate and position segment
             GameObject instance = Instantiate(segmentPrefab, transform);
             instance.transform.position = (a + b) / 2f;
 
-            // Rotate to align with segment
             float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
             instance.transform.rotation = Quaternion.Euler(0, 0, angle);
 
             BoxCollider2D box = instance.GetComponent<BoxCollider2D>();
             if (box != null)
             {
-                // Make collider cover the whole segment
                 Vector2 size = box.size;
-                size.x = length + extraLenght; // along X (forward)
-                size.y = thickness; // height (thickness)
+                size.x = length + extraLenght;
+                size.y = thickness;
                 box.size = size;
                 box.offset = Vector2.zero;
+            }
+
+            if (instance.GetComponent<LineSegmentClickForwarder>() == null)
+            {
+                instance.AddComponent<LineSegmentClickForwarder>();
             }
 
             _spawnedSegments.Add(instance);
@@ -91,5 +99,21 @@ public class LineSegmentColliderSpawner2D : MonoBehaviour
 #endif
         }
         _spawnedSegments.Clear();
+
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            Transform child = transform.GetChild(i);
+            if (child.name.Contains("Clone") || child.name.Contains("Segment") || child.GetComponent<Collider2D>() != null)
+            {
+#if UNITY_EDITOR
+                if (!Application.isPlaying)
+                    DestroyImmediate(child.gameObject);
+                else
+                    Destroy(child.gameObject);
+#else
+                Destroy(child.gameObject);
+#endif
+            }
+        }
     }
 }
