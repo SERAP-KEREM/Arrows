@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8852158018286561598}
   - component: {fileID: 4594035126425610268}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Triangle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -104,7 +104,7 @@ GameObject:
   - component: {fileID: 5917618282005337659}
   - component: {fileID: 2728101366424247942}
   - component: {fileID: 3898713965489042308}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Line (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -352,7 +352,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9200941245333506865}
   - component: {fileID: 1227772318919715864}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Head (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -74,11 +74,6 @@ public class LineSegmentColliderSpawner2D : MonoBehaviour
                 box.offset = Vector2.zero;
             }
 
-            if (instance.GetComponent<LineSegmentClickForwarder>() == null)
-            {
-                instance.AddComponent<LineSegmentClickForwarder>();
-            }
-
             _spawnedSegments.Add(instance);
         }
     }
