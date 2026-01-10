@@ -4,15 +4,24 @@ using UnityEngine;
 [RequireComponent(typeof(LineRenderer))]
 public class LineRendererSnapFixer : MonoBehaviour
 {
-    [Header("Snap Settings")] public float snapSize = 1f; // grid size
+    [Header("Snap Settings")]
+    public float snapSize = 1f;
     public bool snapInEditor = true;
     public bool snapAtRuntime = false;
 
-    [SerializeField] private LineRenderer lr;
+    private LineRenderer lr;
+
+    public void Initialize(LineRenderer lineRenderer)
+    {
+        lr = lineRenderer;
+    }
 
     private void Awake()
     {
-        lr = GetComponent<LineRenderer>();
+        if (lr == null)
+        {
+            lr = GetComponent<LineRenderer>();
+        }
     }
 
     private void LateUpdate()

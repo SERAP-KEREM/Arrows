@@ -175,8 +175,12 @@ LineRenderer:
   m_Positions:
   - {x: 0, y: 0, z: 0}
   - {x: -0, y: -2, z: 0}
-  - {x: 3, y: -2, z: 0}
-  - {x: 1, y: -1, z: 0}
+  - {x: 0, y: -1, z: 0}
+  - {x: 0, y: -2, z: 0}
+  - {x: 1, y: -2, z: 0}
+  - {x: 2, y: -2, z: 0}
+  - {x: 2, y: -1, z: 0}
+  - {x: 2, y: 1, z: 0}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.1
@@ -248,7 +252,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: caaae7410e9dbdc44924a9fe0eefcb08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  line: {fileID: 5703179247697745139}
   speed: 5
   play: 0
   forward: 1
@@ -303,7 +306,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53060e1461fcd754599c3659a81ee598, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  head: {fileID: 6705024964587633368}
+  head: {fileID: 9200941245333506865}
   rayLength: 5
   offset: 0.5
   layerMask:
@@ -326,7 +329,6 @@ MonoBehaviour:
   snapSize: 1
   snapInEditor: 1
   snapAtRuntime: 0
-  lr: {fileID: 5703179247697745139}
 --- !u!114 &3898713965489042308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -339,7 +341,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 585d92063b9e59a4caddef0b5c4e807b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lineRenderer: {fileID: 5703179247697745139}
   segmentPrefab: {fileID: 2915090978192516566, guid: 52be893d423380b4f938c9c92110da5f, type: 3}
   thickness: 0.2
   extraLenght: 0.2
@@ -369,8 +370,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5008393945778542682}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: 0.52573115, w: 0.8506508}
-  m_LocalPosition: {x: 1, y: -1, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 2, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -389,5 +390,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 071824bb32ccacc4f82de9eedad5d494, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lineRenderer: {fileID: 5703179247697745139}
   rotationOffset: -90

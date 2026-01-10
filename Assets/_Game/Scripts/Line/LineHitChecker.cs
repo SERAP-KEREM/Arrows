@@ -7,9 +7,9 @@ public class LineHitChecker : MonoBehaviour
     private bool _active;
     public Action OnLineHit;
 
-    private void Start()
+    public void Initialize(LineRaycastGun2D lineRaycastGun2D)
     {
-        _lineRaycastGun2D = GetComponent<LineRaycastGun2D>();
+        _lineRaycastGun2D = lineRaycastGun2D;
     }
 
     public void StartChecking()
@@ -26,7 +26,7 @@ public class LineHitChecker : MonoBehaviour
 
     private void Update()
     {
-        if (!_active) return;
+        if (!_active || _lineRaycastGun2D == null) return;
 
         if (!_lineRaycastGun2D.Shoot())
             return;

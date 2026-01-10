@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -9,16 +10,25 @@ public class LineDestroyer : MonoBehaviour
     private Coroutine _countdownCoroutine;
     private bool _isCountdownActive;
 
+    public event Action OnCountdownStarted;
+    public event Action OnCountdownStopped;
+    public event Action OnDestroyed;
+
     public void StartCountdown()
     {
+        if (_isCountdownActive) return;
+
         StopCountdown();
         
         _isCountdownActive = true;
         _countdownCoroutine = StartCoroutine(CountdownCoroutine());
+        OnCountdownStarted?.Invoke();
     }
 
     public void StopCountdown()
     {
+        if (!_isCountdownActive) return;
+
         if (_countdownCoroutine != null)
         {
             StopCoroutine(_countdownCoroutine);
@@ -26,6 +36,7 @@ public class LineDestroyer : MonoBehaviour
         }
         
         _isCountdownActive = false;
+        OnCountdownStopped?.Invoke();
     }
 
     private IEnumerator CountdownCoroutine()
@@ -34,6 +45,7 @@ public class LineDestroyer : MonoBehaviour
         
         if (_isCountdownActive)
         {
+            OnDestroyed?.Invoke();
             Destroy(gameObject);
         }
     }

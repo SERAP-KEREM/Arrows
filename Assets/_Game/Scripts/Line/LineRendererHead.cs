@@ -3,8 +3,25 @@ using UnityEngine;
 [ExecuteAlways]
 public class LineRendererHead : MonoBehaviour
 {
-    [SerializeField] private LineRenderer lineRenderer;
-    [SerializeField] private float rotationOffset = 0f; // optional offset for sprite correction
+    private LineRenderer lineRenderer;
+    [SerializeField] private float rotationOffset = 0f;
+
+    public void Initialize(LineRenderer lineRenderer)
+    {
+        this.lineRenderer = lineRenderer;
+    }
+
+    private void Awake()
+    {
+        if (lineRenderer == null)
+        {
+            lineRenderer = GetComponent<LineRenderer>();
+            if (lineRenderer == null)
+            {
+                lineRenderer = GetComponentInParent<LineRenderer>();
+            }
+        }
+    }
 
     private void LateUpdate()
     {

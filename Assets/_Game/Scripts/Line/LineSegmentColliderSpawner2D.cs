@@ -4,7 +4,7 @@ using UnityEngine;
 public class LineSegmentColliderSpawner2D : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private LineRenderer lineRenderer;
+    private LineRenderer lineRenderer;
     [SerializeField] private GameObject segmentPrefab;
 
     [Header("Collider Settings")]
@@ -13,12 +13,28 @@ public class LineSegmentColliderSpawner2D : MonoBehaviour
     [SerializeField] private bool autoUpdateInPlayMode = true;
 
     private readonly List<GameObject> _spawnedSegments = new();
+    private bool _isInitialized;
 
-    private void Start()
+    public void Initialize(LineRenderer lineRenderer)
     {
+        this.lineRenderer = lineRenderer;
+        _isInitialized = true;
+
         if (autoUpdateInPlayMode && Application.isPlaying)
         {
             RebuildSegments();
+        }
+    }
+
+    private void Start()
+    {
+        if (!_isInitialized)
+        {
+            lineRenderer = GetComponent<LineRenderer>();
+            if (lineRenderer != null && autoUpdateInPlayMode && Application.isPlaying)
+            {
+                RebuildSegments();
+            }
         }
     }
 

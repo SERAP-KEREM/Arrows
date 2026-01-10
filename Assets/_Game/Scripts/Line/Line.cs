@@ -57,11 +57,52 @@ public class Line : MonoBehaviour
             return;
         }
 
+        InjectDependencies();
+
         IsInitialized = true;
 
         if (LineManager.IsInitialized)
         {
             LineManager.Instance.RegisterLine(this);
+        }
+    }
+
+    private void InjectDependencies()
+    {
+        if (_animation != null)
+        {
+            _animation.Initialize(_lineRenderer);
+        }
+
+        if (_hitChecker != null)
+        {
+            LineRaycastGun2D raycastGun = GetComponent<LineRaycastGun2D>();
+            if (raycastGun != null)
+            {
+                _hitChecker.Initialize(raycastGun);
+            }
+        }
+
+        if (_click != null)
+        {
+            _click.Initialize(_animation, _hitChecker, _destroyer);
+        }
+
+        if (_colliderSpawner != null)
+        {
+            _colliderSpawner.Initialize(_lineRenderer);
+        }
+
+        LineRendererHead head = GetComponent<LineRendererHead>();
+        if (head != null)
+        {
+            head.Initialize(_lineRenderer);
+        }
+
+        LineRendererSnapFixer snapFixer = GetComponent<LineRendererSnapFixer>();
+        if (snapFixer != null)
+        {
+            snapFixer.Initialize(_lineRenderer);
         }
     }
 

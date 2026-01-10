@@ -1,9 +1,10 @@
+using System;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 public class LineAnimation : MonoBehaviour
 {
-    [SerializeField] private LineRenderer line;
+    private LineRenderer line;
     [SerializeField] private float speed = 5f;
 
     public bool play;
@@ -11,10 +12,18 @@ public class LineAnimation : MonoBehaviour
 
     public Vector3 direction;
     [FormerlySerializedAs("positions")] public Vector3[] positionsOrigin;
+    private bool _isInitialized;
+    private bool _wasPlaying;
 
-    private void Start()
+    public event Action<bool> OnAnimationStarted;
+    public event Action OnAnimationStopped;
+    public event Action OnAnimationCompleted;
+
+    public void Initialize(LineRenderer lineRenderer)
     {
-        if (line == null) return;
+        if (lineRenderer == null) return;
+
+        line = lineRenderer;
         
         var count = line.positionCount;
         if (count < 2) return;
@@ -27,29 +36,55 @@ public class LineAnimation : MonoBehaviour
 
         var lastPoint = line.GetPosition(count - 1);
         direction = lastPoint - line.GetPosition(count - 2);
+        
+        _isInitialized = true;
     }
 
     public void Play(bool forwardDirection)
     {
-        if (line == null || line.positionCount < 2)
+        if (!_isInitialized || line == null || line.positionCount < 2)
             return;
         
+        bool wasPlaying = play;
         forward = forwardDirection;
         play = true;
+
+        if (!wasPlaying)
+        {
+            OnAnimationStarted?.Invoke(forwardDirection);
+        }
     }
 
     public void Stop()
     {
-        play = false;
+        if (play)
+        {
+            play = false;
+            OnAnimationStopped?.Invoke();
+        }
     }
 
     private void Update()
     {
-        if (!play) return;
+        bool wasPlaying = _wasPlaying;
+        _wasPlaying = play;
+
+        if (!play)
+        {
+            if (wasPlaying)
+            {
+                OnAnimationStopped?.Invoke();
+            }
+            return;
+        }
 
         if (!line || line.positionCount < 2)
         {
             play = false;
+            if (wasPlaying)
+            {
+                OnAnimationStopped?.Invoke();
+            }
             return;
         }
 
@@ -83,6 +118,12 @@ public class LineAnimation : MonoBehaviour
 
         line.positionCount = newCount;
         line.SetPositions(newPositions);
+
+        if (newCount < 2)
+        {
+            play = false;
+            OnAnimationCompleted?.Invoke();
+        }
     }
 
     private void AnimateBackward()
@@ -97,6 +138,7 @@ public class LineAnimation : MonoBehaviour
         if (isSameCount && Vector3.Distance(tailPosition, originTailPosition) < 0.1f)
         {
             play = false;
+            OnAnimationCompleted?.Invoke();
             return;
         }
 
