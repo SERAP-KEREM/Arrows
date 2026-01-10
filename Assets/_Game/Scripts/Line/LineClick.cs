@@ -8,18 +8,32 @@ public class LineClick : MonoBehaviour, ISelectable
     private LineHitChecker _hitChecker;
     private LineDestroyer _lineDestroyer;
 
-    private void Start()
+    private void Awake()
     {
         _animation = GetComponent<LineAnimation>();
         _hitChecker = GetComponent<LineHitChecker>();
         _lineDestroyer = GetComponent<LineDestroyer>();
-        _hitChecker.OnLineHit += HandleLineHit;
     }
+
+        private void Start()
+        {
+            if (_hitChecker != null)
+            {
+                _hitChecker.OnLineHit += HandleLineHit;
+            }
+        }
 
     private void HandleLineHit()
     {
-        _animation.Play(forwardDirection: false);
-        _lineDestroyer.StopCountdown();
+        if (_animation != null)
+        {
+            _animation.Play(forwardDirection: false);
+        }
+        
+        if (_lineDestroyer != null)
+        {
+            _lineDestroyer.StopCountdown();
+        }
     }
 
     public void OnSelected(Vector3 worldPosition)

@@ -16,8 +16,8 @@ namespace SerapKeremGameKit._LevelSystem
 
         // [Title("Coins Settings")] // coin settings can be added here if level-specific
 
-		[Title("Grid Settings"), PropertyOrder(2)]
-		[SerializeField] private Array2DInt _tileSizeArray;
+        [Title("Grid Settings"), PropertyOrder(2)]
+        [SerializeField] private Array2DInt _tileSizeArray;
 
         [Title("Time Settings")]
         [SerializeField, Min(0f)] private float _levelTime = 120f;
@@ -30,8 +30,10 @@ namespace SerapKeremGameKit._LevelSystem
         [SerializeField] private long _money = 10;
         public long Money => _money;
 
+
         private Coroutine _winCoroutine;
         private Coroutine _loseCoroutine;
+
 
         // [SerializeField] private Transform _levelCameraPoint;
 
@@ -44,7 +46,7 @@ namespace SerapKeremGameKit._LevelSystem
             if (_winCoroutine != null) { StopCoroutine(_winCoroutine); _winCoroutine = null; }
             if (_loseCoroutine != null) { StopCoroutine(_loseCoroutine); _loseCoroutine = null; }
             Initialize();
-        
+
         }
         private void Initialize()
         {
@@ -55,6 +57,19 @@ namespace SerapKeremGameKit._LevelSystem
         {
             yield return new WaitForSeconds(0.1f);
             InitializeCamera();
+            InitializeLines();
+        }
+
+        private void InitializeLines()
+        {
+            if (LineManager.IsInitialized)
+            {
+                LineManager.Instance.InitializeLines(transform);
+            }
+            else
+            {
+                TraceLogger.LogWarning("LineManager is not initialized. Lines will not be initialized.", this);
+            }
         }
 
         private void InitializeCamera()
@@ -108,7 +123,7 @@ namespace SerapKeremGameKit._LevelSystem
 
         private IEnumerator WinCoroutine()
         {
-			if (InputHandler.Instance != null) InputHandler.Instance.LockInput();
+            if (InputHandler.Instance != null) InputHandler.Instance.LockInput();
             yield return new WaitForSeconds(0.5f);
             // Example: reward coins for win
             // int coins = PlayerPrefs.GetInt("skgk.currency.coins", 0) + 10; PlayerPrefs.SetInt("skgk.currency.coins", coins); PlayerPrefs.Save();
@@ -124,7 +139,7 @@ namespace SerapKeremGameKit._LevelSystem
 
         private IEnumerator LoseCoroutine()
         {
-			if (InputHandler.Instance != null) InputHandler.Instance.LockInput();
+            if (InputHandler.Instance != null) InputHandler.Instance.LockInput();
             yield return new WaitForSeconds(0.5f);
 
             TraceLogger.Log("LOSE!!!");

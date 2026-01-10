@@ -38,6 +38,11 @@ public class LineAnimation : MonoBehaviour
         play = true;
     }
 
+    public void Stop()
+    {
+        play = false;
+    }
+
     private void Update()
     {
         if (!play) return;

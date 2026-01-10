@@ -15,6 +15,13 @@ public class LineHitChecker : MonoBehaviour
     public void StartChecking()
     {
         _active = true;
+        enabled = true;
+    }
+
+    public void StopChecking()
+    {
+        _active = false;
+        enabled = false;
     }
 
     private void Update()
@@ -24,7 +31,6 @@ public class LineHitChecker : MonoBehaviour
         if (!_lineRaycastGun2D.Shoot())
             return;
 
-        Debug.Log("Line hit detected!");
         _active = false;
         OnLineHit?.Invoke();
     }

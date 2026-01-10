@@ -3,12 +3,12 @@ using UnityEngine;
 public class LineRaycastGun2D : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private Transform head; // usually your line head object
+    [SerializeField] private Transform head;
 
     [Header("Ray Settings")]
     [SerializeField] private float rayLength = 5f;
     [SerializeField] private float offset = 0.5f;
-    [SerializeField] private LayerMask layerMask = ~0; // default: everything
+    [SerializeField] private LayerMask layerMask = ~0;
     [SerializeField] private bool shootEveryFrame = true;
 
     [Header("Debug")]
@@ -38,7 +38,6 @@ public class LineRaycastGun2D : MonoBehaviour
 
         if (LastHit.collider != null)
         {
-            Debug.Log($"[LineRaycastGun2D] Hit: {LastHit.collider.name}", LastHit.collider);
             return true;
         }
 
