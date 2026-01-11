@@ -1,27 +1,19 @@
 using UnityEngine;
 
 [ExecuteAlways]
-[RequireComponent(typeof(LineRenderer))]
 public class LineRendererSnapFixer : MonoBehaviour
 {
+    [Header("References")]
+    [SerializeField] private LineRenderer lr;
+
     [Header("Snap Settings")]
     public float snapSize = 1f;
     public bool snapInEditor = true;
     public bool snapAtRuntime = false;
 
-    private LineRenderer lr;
-
     public void Initialize(LineRenderer lineRenderer)
     {
         lr = lineRenderer;
-    }
-
-    private void Awake()
-    {
-        if (lr == null)
-        {
-            lr = GetComponent<LineRenderer>();
-        }
     }
 
     private void LateUpdate()

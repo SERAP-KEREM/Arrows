@@ -97,6 +97,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6705024964587633368}
   - component: {fileID: 5703179247697745139}
+  - component: {fileID: 2004340178550153643}
   - component: {fileID: 2889735952934244776}
   - component: {fileID: 579988495362921800}
   - component: {fileID: 6068188263390121324}
@@ -240,6 +241,24 @@ LineRenderer:
   m_UseWorldSpace: 0
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!114 &2004340178550153643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4852218959071952598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b20bef11f067d2409386423ec0100ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _lineRenderer: {fileID: 5703179247697745139}
+  _animation: {fileID: 2889735952934244776}
+  _click: {fileID: 4698239093576954667}
+  _hitChecker: {fileID: 6068188263390121324}
+  _destroyer: {fileID: 579988495362921800}
+  _colliderSpawner: {fileID: 3898713965489042308}
 --- !u!114 &2889735952934244776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -282,6 +301,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e093bc85e256984897722a47d981e3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _lineRaycastGun2D: {fileID: 0}
 --- !u!114 &4698239093576954667
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -311,7 +331,7 @@ MonoBehaviour:
   offset: 0.5
   layerMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 128
   shootEveryFrame: 1
   drawGizmos: 1
 --- !u!114 &2728101366424247942
@@ -326,6 +346,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a67436211136dd4786c17f7238eeba5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lr: {fileID: 0}
   snapSize: 1
   snapInEditor: 1
   snapAtRuntime: 0
@@ -390,4 +411,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 071824bb32ccacc4f82de9eedad5d494, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lineRenderer: {fileID: 5703179247697745139}
   rotationOffset: -90

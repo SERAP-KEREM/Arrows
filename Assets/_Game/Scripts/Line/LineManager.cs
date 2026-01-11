@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using SerapKeremGameKit._Logging;
-using SerapKeremGameKit._Singletons;
 using TriInspector;
 
-public class LineManager : MonoSingleton<LineManager>
+public class LineManager : MonoBehaviour
 {
     [Header("Active Lines")]
     [SerializeField, ReadOnly] 

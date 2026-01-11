@@ -5,29 +5,18 @@ using SerapKeremGameKit._Managers;
 [RequireComponent(typeof(LineRenderer))]
 public class Line : MonoBehaviour
 {
-    private LineAnimation _animation;
-    private LineClick _click;
-    private LineHitChecker _hitChecker;
-    private LineDestroyer _destroyer;
-    private LineSegmentColliderSpawner2D _colliderSpawner;
-    private LineRenderer _lineRenderer;
+    [Header("Component References")]
+    [SerializeField] private LineRenderer _lineRenderer;
+    [SerializeField] private LineAnimation _animation;
+    [SerializeField] private LineClick _click;
+    [SerializeField] private LineHitChecker _hitChecker;
+    [SerializeField] private LineDestroyer _destroyer;
+    [SerializeField] private LineSegmentColliderSpawner2D _colliderSpawner;
 
     public LineRenderer LineRenderer => _lineRenderer;
     public LineAnimation Animation => _animation;
     public LineClick Click => _click;
     public bool IsInitialized { get; private set; }
-
-    private void Awake()
-    {
-        _lineRenderer = GetComponent<LineRenderer>();
-        _animation = GetComponent<LineAnimation>();
-        _click = GetComponent<LineClick>();
-        _hitChecker = GetComponent<LineHitChecker>();
-        _destroyer = GetComponent<LineDestroyer>();
-        _colliderSpawner = GetComponent<LineSegmentColliderSpawner2D>();
-
-        ValidateComponents();
-    }
 
     private void ValidateComponents()
     {
@@ -45,9 +34,11 @@ public class Line : MonoBehaviour
             return;
         }
 
+        ValidateComponents();
+
         if (_lineRenderer == null)
         {
-            TraceLogger.LogError($"Cannot initialize {name}: LineRenderer is missing.", this);
+            TraceLogger.LogError($"Cannot initialize {name}: LineRenderer is missing. Please assign it in the Inspector.", this);
             return;
         }
 
@@ -61,9 +52,9 @@ public class Line : MonoBehaviour
 
         IsInitialized = true;
 
-        if (LineManager.IsInitialized)
+        if (LevelManager.Instance.ActiveLevelInstance.LineManager)
         {
-            LineManager.Instance.RegisterLine(this);
+            LevelManager.Instance.ActiveLevelInstance.LineManager.RegisterLine(this);
         }
     }
 
@@ -74,15 +65,6 @@ public class Line : MonoBehaviour
             _animation.Initialize(_lineRenderer);
         }
 
-        if (_hitChecker != null)
-        {
-            LineRaycastGun2D raycastGun = GetComponent<LineRaycastGun2D>();
-            if (raycastGun != null)
-            {
-                _hitChecker.Initialize(raycastGun);
-            }
-        }
-
         if (_click != null)
         {
             _click.Initialize(_animation, _hitChecker, _destroyer);
@@ -91,18 +73,6 @@ public class Line : MonoBehaviour
         if (_colliderSpawner != null)
         {
             _colliderSpawner.Initialize(_lineRenderer);
-        }
-
-        LineRendererHead head = GetComponent<LineRendererHead>();
-        if (head != null)
-        {
-            head.Initialize(_lineRenderer);
-        }
-
-        LineRendererSnapFixer snapFixer = GetComponent<LineRendererSnapFixer>();
-        if (snapFixer != null)
-        {
-            snapFixer.Initialize(_lineRenderer);
         }
     }
 
@@ -130,9 +100,9 @@ public class Line : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (LineManager.IsInitialized)
+        if (LevelManager.Instance.ActiveLevelInstance.LineManager)
         {
-            LineManager.Instance.UnregisterLine(this);
+            LevelManager.Instance.ActiveLevelInstance.LineManager.UnregisterLine(this);
         }
     }
 }

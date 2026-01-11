@@ -34,7 +34,8 @@ namespace SerapKeremGameKit._LevelSystem
         private Coroutine _winCoroutine;
         private Coroutine _loseCoroutine;
 
-
+        [SerializeField] private LineManager _lineManager;
+        public LineManager LineManager { get => _lineManager; set => _lineManager = value; }
         // [SerializeField] private Transform _levelCameraPoint;
 
         // [SerializeField] private float _currentLevelSize = 0f;
@@ -62,9 +63,9 @@ namespace SerapKeremGameKit._LevelSystem
 
         private void InitializeLines()
         {
-            if (LineManager.IsInitialized)
+            if (LevelManager.Instance.ActiveLevelInstance.LineManager)
             {
-                LineManager.Instance.InitializeLines(transform);
+                LevelManager.Instance.ActiveLevelInstance.LineManager.InitializeLines(transform);
             }
             else
             {

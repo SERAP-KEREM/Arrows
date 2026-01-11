@@ -3,13 +3,18 @@ using UnityEngine;
 
 public class LineHitChecker : MonoBehaviour
 {
-    private LineRaycastGun2D _lineRaycastGun2D;
+    [Header("References")]
+    [SerializeField] private LineRaycastGun2D _lineRaycastGun2D;
+    
     private bool _active;
     public Action OnLineHit;
 
     public void Initialize(LineRaycastGun2D lineRaycastGun2D)
     {
-        _lineRaycastGun2D = lineRaycastGun2D;
+        if (lineRaycastGun2D != null)
+        {
+            _lineRaycastGun2D = lineRaycastGun2D;
+        }
     }
 
     public void StartChecking()
