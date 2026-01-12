@@ -3,7 +3,9 @@ using UnityEngine;
 using SerapKeremGameKit._Logging;
 using TriInspector;
 
-public class LineManager : MonoBehaviour
+namespace _Game.Line
+{
+    public class LineManager : MonoBehaviour
 {
     [Header("Active Lines")]
     [SerializeField, ReadOnly] 
@@ -119,4 +121,4 @@ public class LineManager : MonoBehaviour
         return _activeLines[index];
     }
 }
-
+}

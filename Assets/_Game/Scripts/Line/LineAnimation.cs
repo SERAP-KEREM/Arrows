@@ -2,7 +2,9 @@ using System;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class LineAnimation : MonoBehaviour
+namespace _Game.Line
+{
+    public class LineAnimation : MonoBehaviour
 {
     private LineRenderer line;
     [SerializeField] private float speed = 5f;
@@ -14,6 +16,8 @@ public class LineAnimation : MonoBehaviour
     [FormerlySerializedAs("positions")] public Vector3[] positionsOrigin;
     private bool _isInitialized;
     private bool _wasPlaying;
+    private Vector3[] _tempPositionsArray;
+    private static Vector3ArrayPool _arrayPool;
 
     public event Action<bool> OnAnimationStarted;
     public event Action OnAnimationStopped;
@@ -36,6 +40,16 @@ public class LineAnimation : MonoBehaviour
 
         var lastPoint = line.GetPosition(count - 1);
         direction = lastPoint - line.GetPosition(count - 2);
+        
+        if (_arrayPool == null)
+        {
+            _arrayPool = FindFirstObjectByType<Vector3ArrayPool>();
+            if (_arrayPool == null)
+            {
+                GameObject poolObj = new GameObject(nameof(Vector3ArrayPool));
+                _arrayPool = poolObj.AddComponent<Vector3ArrayPool>();
+            }
+        }
         
         _isInitialized = true;
     }
@@ -61,6 +75,21 @@ public class LineAnimation : MonoBehaviour
         {
             play = false;
             OnAnimationStopped?.Invoke();
+        }
+        
+        if (_tempPositionsArray != null && _arrayPool != null)
+        {
+            _arrayPool.RecycleArray(_tempPositionsArray);
+            _tempPositionsArray = null;
+        }
+    }
+    
+    private void OnDestroy()
+    {
+        if (_tempPositionsArray != null && _arrayPool != null)
+        {
+            _arrayPool.RecycleArray(_tempPositionsArray);
+            _tempPositionsArray = null;
         }
     }
 
@@ -110,14 +139,28 @@ public class LineAnimation : MonoBehaviour
         if (!(Vector3.Distance(tailPoint, line.GetPosition(1)) < 0.1f)) return;
 
         var newCount = count - 1;
-        var newPositions = new Vector3[newCount];
+        if (_arrayPool != null)
+        {
+            _tempPositionsArray = _arrayPool.GetArray(newCount);
+        }
+        else
+        {
+            _tempPositionsArray = new Vector3[newCount];
+        }
+        
         for (int i = 1; i < count; i++)
         {
-            newPositions[i - 1] = line.GetPosition(i);
+            _tempPositionsArray[i - 1] = line.GetPosition(i);
         }
 
         line.positionCount = newCount;
-        line.SetPositions(newPositions);
+        line.SetPositions(_tempPositionsArray);
+        
+        if (_arrayPool != null)
+        {
+            _arrayPool.RecycleArray(_tempPositionsArray);
+        }
+        _tempPositionsArray = null;
 
         if (newCount < 2)
         {
@@ -168,16 +211,30 @@ public class LineAnimation : MonoBehaviour
             return;
 
         var newCount = countCurrent + 1;
-        var newPositions = new Vector3[newCount];
+        if (_arrayPool != null)
+        {
+            _tempPositionsArray = _arrayPool.GetArray(newCount);
+        }
+        else
+        {
+            _tempPositionsArray = new Vector3[newCount];
+        }
 
-        newPositions[0] = positionsOrigin[indexTarget];
-        newPositions[1] = positionsOrigin[indexTarget];
+        _tempPositionsArray[0] = positionsOrigin[indexTarget];
+        _tempPositionsArray[1] = positionsOrigin[indexTarget];
         for (int i = 1; i < countCurrent; i++)
         {
-            newPositions[i + 1] = line.GetPosition(i);
+            _tempPositionsArray[i + 1] = line.GetPosition(i);
         }
 
         line.positionCount = newCount;
-        line.SetPositions(newPositions);
+        line.SetPositions(_tempPositionsArray);
+        
+        if (_arrayPool != null)
+        {
+            _arrayPool.RecycleArray(_tempPositionsArray);
+        }
+        _tempPositionsArray = null;
     }
+}
 }

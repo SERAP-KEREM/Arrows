@@ -1,7 +1,9 @@
 using System;
 using UnityEngine;
 
-public class LineHitChecker : MonoBehaviour
+namespace _Game.Line
+{
+    public class LineHitChecker : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private LineRaycastGun2D _lineRaycastGun2D;
@@ -39,4 +41,5 @@ public class LineHitChecker : MonoBehaviour
         _active = false;
         OnLineHit?.Invoke();
     }
+}
 }

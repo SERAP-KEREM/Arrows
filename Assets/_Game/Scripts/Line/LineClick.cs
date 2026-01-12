@@ -2,7 +2,9 @@ using System;
 using UnityEngine;
 using SerapKeremGameKit._InputSystem;
 
-public class LineClick : MonoBehaviour, ISelectable
+namespace _Game.Line
+{
+    public class LineClick : MonoBehaviour, ISelectable
 {
     private LineAnimation _animation;
     private LineHitChecker _hitChecker;
@@ -107,4 +109,5 @@ public class LineClick : MonoBehaviour, ISelectable
         _animation.Play(forwardDirection: true);
         _hitChecker.StartChecking();
     }
+}
 }

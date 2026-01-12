@@ -1,7 +1,9 @@
 using UnityEngine;
 
-[ExecuteAlways]
-public class LineRendererSnapFixer : MonoBehaviour
+namespace _Game.Line
+{
+    [ExecuteAlways]
+    public class LineRendererSnapFixer : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private LineRenderer lr;
@@ -57,4 +59,5 @@ public class LineRendererSnapFixer : MonoBehaviour
         pos.z = Mathf.Round(pos.z / s) * s;
         return pos;
     }
+}
 }

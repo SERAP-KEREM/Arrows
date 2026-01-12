@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class LineDestroyer : MonoBehaviour
+namespace _Game.Line
+{
+    public class LineDestroyer : MonoBehaviour
 {
     [Header("Destroy Settings")]
     [SerializeField] private float destroyDelay = 5f;
@@ -55,5 +57,5 @@ public class LineDestroyer : MonoBehaviour
         StopCountdown();
     }
 }
-
+}
 

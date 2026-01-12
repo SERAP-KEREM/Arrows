@@ -2,8 +2,10 @@ using UnityEngine;
 using SerapKeremGameKit._Logging;
 using SerapKeremGameKit._Managers;
 
-[RequireComponent(typeof(LineRenderer))]
-public class Line : MonoBehaviour
+namespace _Game.Line
+{
+    [RequireComponent(typeof(LineRenderer))]
+    public class Line : MonoBehaviour
 {
     [Header("Component References")]
     [SerializeField] private LineRenderer _lineRenderer;
@@ -105,4 +107,5 @@ public class Line : MonoBehaviour
             LevelManager.Instance.ActiveLevelInstance.LineManager.UnregisterLine(this);
         }
     }
+}
 }

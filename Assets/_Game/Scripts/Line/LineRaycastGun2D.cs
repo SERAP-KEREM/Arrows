@@ -1,6 +1,8 @@
 using UnityEngine;
 
-public class LineRaycastGun2D : MonoBehaviour
+namespace _Game.Line
+{
+    public class LineRaycastGun2D : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Transform head;
@@ -78,4 +80,5 @@ public class LineRaycastGun2D : MonoBehaviour
         Gizmos.DrawLine(origin, end);
         Gizmos.DrawSphere(end, 0.06f);
     }
+}
 }

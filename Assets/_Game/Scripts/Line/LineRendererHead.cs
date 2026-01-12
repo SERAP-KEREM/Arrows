@@ -1,7 +1,9 @@
 using UnityEngine;
 
-[ExecuteAlways]
-public class LineRendererHead : MonoBehaviour
+namespace _Game.Line
+{
+    [ExecuteAlways]
+    public class LineRendererHead : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private LineRenderer lineRenderer;
@@ -35,4 +37,5 @@ public class LineRendererHead : MonoBehaviour
 
         transform.rotation = Quaternion.Euler(0, 0, angle + rotationOffset);
     }
+}
 }

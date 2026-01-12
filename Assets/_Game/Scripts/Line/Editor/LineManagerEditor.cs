@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
+using _Game.Line;
 
 [CustomEditor(typeof(LineManager))]
 public class LineManagerEditor : Editor

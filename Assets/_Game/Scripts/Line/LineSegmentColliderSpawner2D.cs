@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LineSegmentColliderSpawner2D : MonoBehaviour
+namespace _Game.Line
+{
+    public class LineSegmentColliderSpawner2D : MonoBehaviour
 {
     [Header("References")]
     private LineRenderer lineRenderer;
@@ -113,4 +115,5 @@ public class LineSegmentColliderSpawner2D : MonoBehaviour
             }
         }
     }
+}
 }
