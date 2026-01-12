@@ -51,6 +51,7 @@ namespace _Game.Line
         }
 
         InjectDependencies();
+        SubscribeToEvents();
 
         IsInitialized = true;
 
@@ -78,9 +79,35 @@ namespace _Game.Line
         }
     }
 
+    private void SubscribeToEvents()
+    {
+        if (_animation != null)
+        {
+            _animation.OnAnimationStarted += HandleAnimationStarted;
+        }
+    }
+
+    private void UnsubscribeFromEvents()
+    {
+        if (_animation != null)
+        {
+            _animation.OnAnimationStarted -= HandleAnimationStarted;
+        }
+    }
+
+    private void HandleAnimationStarted(bool forwardDirection)
+    {
+        if (_colliderSpawner != null)
+        {
+            _colliderSpawner.ClearSegments();
+        }
+    }
+
     public void Cleanup()
     {
         if (!IsInitialized) return;
+
+        UnsubscribeFromEvents();
 
         if (_destroyer != null)
         {
@@ -102,6 +129,8 @@ namespace _Game.Line
 
     private void OnDestroy()
     {
+        UnsubscribeFromEvents();
+        
         if (LevelManager.Instance.ActiveLevelInstance.LineManager)
         {
             LevelManager.Instance.ActiveLevelInstance.LineManager.UnregisterLine(this);

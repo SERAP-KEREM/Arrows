@@ -82,7 +82,7 @@ namespace _Game.Line
         }
     }
 
-    private void ClearSegments()
+    public void ClearSegments()
     {
         foreach (var go in _spawnedSegments)
         {
