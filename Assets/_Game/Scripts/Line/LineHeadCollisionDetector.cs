@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using SerapKeremGameKit._Logging;
 
 namespace _Game.Line
 {

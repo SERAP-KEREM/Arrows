@@ -96,8 +96,6 @@ namespace _Game.Line
     
     private void OnDisable()
     {
-        // Don't reactivate here to avoid "already being activated" error
-        // Head object should remain active through other lifecycle methods
     }
 
     private void LateUpdate()

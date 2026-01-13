@@ -105,6 +105,7 @@ GameObject:
   - component: {fileID: 5917618282005337659}
   - component: {fileID: 2728101366424247942}
   - component: {fileID: 3898713965489042308}
+  - component: {fileID: 8190878419885716933}
   m_Layer: 7
   m_Name: Line (1)
   m_TagString: Untagged
@@ -260,6 +261,7 @@ MonoBehaviour:
   _destroyer: {fileID: 579988495362921800}
   _colliderSpawner: {fileID: 3898713965489042308}
   _lineHead: {fileID: 1227772318919715864}
+  _materialHandler: {fileID: 0}
 --- !u!114 &2889735952934244776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -273,10 +275,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
-  play: 0
-  forward: 1
-  direction: {x: 0, y: 0, z: 0}
-  positionsOrigin: []
 --- !u!114 &579988495362921800
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -367,6 +365,23 @@ MonoBehaviour:
   thickness: 0.2
   extraLenght: 0.2
   autoUpdateInPlayMode: 1
+--- !u!114 &8190878419885716933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4852218959071952598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6e3595dde55a4049bd9ecbf5e211aa6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _renderers:
+  - {fileID: 8852158018286561598}
+  - {fileID: 6705024964587633368}
+  _failureColor: {r: 1, g: 0, b: 0, a: 1}
+  _failureColorDuration: 1
 --- !u!1 &5008393945778542682
 GameObject:
   m_ObjectHideFlags: 0
