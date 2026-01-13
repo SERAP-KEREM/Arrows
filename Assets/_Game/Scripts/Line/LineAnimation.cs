@@ -10,15 +10,18 @@ namespace _Game.Line
     private LineRenderer line;
     [SerializeField] private float speed = 5f;
 
-    public bool play;
-    public bool forward = true;
-
-    public Vector3 direction;
-    [FormerlySerializedAs("positions")] public Vector3[] positionsOrigin;
+    private bool _isPlaying;
+    private bool _forward;
+    private Vector3 _direction;
+    [FormerlySerializedAs("positions")] private Vector3[] positionsOrigin;
     private bool _isInitialized;
     private bool _wasPlaying;
     private Vector3[] _tempPositionsArray;
     private static Vector3ArrayPool _arrayPool;
+
+    public bool IsPlaying => _isPlaying;
+    public bool IsForward => _forward;
+    public Vector3 Direction => _direction;
 
     public event Action<bool> OnAnimationStarted;
     public event Action OnAnimationStopped;
@@ -41,7 +44,7 @@ namespace _Game.Line
         }
 
         var lastPoint = line.GetPosition(count - 1);
-        direction = lastPoint - line.GetPosition(count - 2);
+        _direction = lastPoint - line.GetPosition(count - 2);
         
         if (_arrayPool == null)
         {
@@ -61,9 +64,9 @@ namespace _Game.Line
         if (!_isInitialized || line == null || line.positionCount < 2)
             return;
         
-        bool wasPlaying = play;
-        forward = forwardDirection;
-        play = true;
+        bool wasPlaying = _isPlaying;
+        _forward = forwardDirection;
+        _isPlaying = true;
 
         if (!wasPlaying)
         {
@@ -74,9 +77,9 @@ namespace _Game.Line
 
     public void Stop()
     {
-        if (play)
+        if (_isPlaying)
         {
-            play = false;
+            _isPlaying = false;
             OnAnimationStopped?.Invoke();
         }
         
@@ -99,9 +102,9 @@ namespace _Game.Line
     private void Update()
     {
         bool wasPlaying = _wasPlaying;
-        _wasPlaying = play;
+        _wasPlaying = _isPlaying;
 
-        if (!play)
+        if (!_isPlaying)
         {
             if (wasPlaying)
             {
@@ -112,7 +115,7 @@ namespace _Game.Line
 
         if (!line || line.positionCount < 2)
         {
-            play = false;
+            _isPlaying = false;
             if (wasPlaying)
             {
                 OnAnimationStopped?.Invoke();
@@ -120,7 +123,7 @@ namespace _Game.Line
             return;
         }
 
-        if (forward)
+        if (_forward)
             AnimateForward();
         else
             AnimateBackward();
@@ -131,7 +134,7 @@ namespace _Game.Line
         var count = line.positionCount;
         var lastPoint = line.GetPosition(count - 1);
 
-        lastPoint += direction.normalized * (speed * Time.deltaTime);
+        lastPoint += _direction.normalized * (speed * Time.deltaTime);
         line.SetPosition(count - 1, lastPoint);
 
         var tailPoint = line.GetPosition(0);
@@ -171,7 +174,7 @@ namespace _Game.Line
 
         if (newCount < 2)
         {
-            play = false;
+            _isPlaying = false;
             OnAnimationCompleted?.Invoke();
         }
     }
@@ -229,7 +232,7 @@ namespace _Game.Line
         if (allPositionsClose && countCurrent == countOrigin)
         {
             line.SetPositions(positionsOrigin);
-            play = false;
+            _isPlaying = false;
             OnLinePositionsChanged?.Invoke();
             OnAnimationCompleted?.Invoke();
             return;

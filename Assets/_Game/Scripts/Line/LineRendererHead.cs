@@ -19,11 +19,21 @@ namespace _Game.Line
         this.lineRenderer = lineRenderer;
         _ownLine = ownLine;
         
+        EnsureActive();
+        SetupPhysicsComponents();
+        SetupCollisionDetector();
+    }
+
+    private void EnsureActive()
+    {
         if (!gameObject.activeSelf)
         {
             gameObject.SetActive(true);
         }
-        
+    }
+
+    private void SetupPhysicsComponents()
+    {
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb == null)
         {
@@ -37,13 +47,12 @@ namespace _Game.Line
         {
             circleCollider = gameObject.AddComponent<CircleCollider2D>();
             circleCollider.radius = 0.3f;
-            circleCollider.isTrigger = true;
         }
-        else
-        {
-            circleCollider.isTrigger = true;
-        }
-        
+        circleCollider.isTrigger = true;
+    }
+
+    private void SetupCollisionDetector()
+    {
         _collisionDetector = GetComponent<LineHeadCollisionDetector>();
         if (_collisionDetector == null)
         {
@@ -59,26 +68,17 @@ namespace _Game.Line
     
     private void Awake()
     {
-        if (!gameObject.activeSelf)
-        {
-            gameObject.SetActive(true);
-        }
+        EnsureActive();
     }
 
     private void OnEnable()
     {
-        if (!gameObject.activeSelf)
-        {
-            gameObject.SetActive(true);
-        }
+        EnsureActive();
     }
 
     private void Start()
     {
-        if (!gameObject.activeSelf)
-        {
-            gameObject.SetActive(true);
-        }
+        EnsureActive();
     }
     
     private void HandleHeadCollision(Collider2D other)
@@ -96,10 +96,8 @@ namespace _Game.Line
     
     private void OnDisable()
     {
-        if (this != null && gameObject != null)
-        {
-            gameObject.SetActive(true);
-        }
+        // Don't reactivate here to avoid "already being activated" error
+        // Head object should remain active through other lifecycle methods
     }
 
     private void LateUpdate()

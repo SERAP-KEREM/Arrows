@@ -50,13 +50,15 @@ namespace _Game.Line
             TraceLogger.LogWarning($"Cannot initialize {name}: LineRenderer has less than 2 positions ({_lineRenderer.positionCount}).", this);
             return;
         }
-
+        
         InjectDependencies();
         SubscribeToEvents();
 
         IsInitialized = true;
 
-        if (LevelManager.Instance.ActiveLevelInstance.LineManager)
+        if (LevelManager.IsInitialized && 
+            LevelManager.Instance.ActiveLevelInstance != null && 
+            LevelManager.Instance.ActiveLevelInstance.LineManager != null)
         {
             LevelManager.Instance.ActiveLevelInstance.LineManager.RegisterLine(this);
         }
@@ -79,6 +81,11 @@ namespace _Game.Line
             _colliderSpawner.Initialize(_lineRenderer);
         }
 
+        InitializeLineHead();
+    }
+
+    private void InitializeLineHead()
+    {
         if (_lineHead == null)
         {
             _lineHead = GetComponentInChildren<LineRendererHead>(true);
@@ -86,46 +93,30 @@ namespace _Game.Line
         
         if (_lineHead == null)
         {
-            LineRendererHead[] allHeads = FindObjectsByType<LineRendererHead>(FindObjectsSortMode.None);
-            foreach (var head in allHeads)
-            {
-                if (head != null && head.transform.IsChildOf(transform))
-                {
-                    _lineHead = head;
-                    break;
-                }
-            }
-        }
-        
-        if (_lineHead == null)
-        {
-            GameObject headObj = new GameObject("Head");
-            headObj.transform.SetParent(transform);
-            headObj.transform.localPosition = Vector3.zero;
-            headObj.SetActive(true);
-            _lineHead = headObj.AddComponent<LineRendererHead>();
-        }
-        else
-        {
-            if (_lineHead.gameObject != null)
-            {
-                _lineHead.gameObject.SetActive(true);
-            }
+            _lineHead = CreateLineHead();
         }
 
         if (_lineHead != null && _lineHead.gameObject != null)
         {
+            _lineHead.gameObject.SetActive(true);
             _lineHead.Initialize(_lineRenderer, this);
             _lineHead.OnHeadCollision += HandleHeadCollision;
-            _lineHead.gameObject.SetActive(true);
         }
+    }
+
+    private LineRendererHead CreateLineHead()
+    {
+        GameObject headObj = new GameObject("Head");
+        headObj.transform.SetParent(transform);
+        headObj.transform.localPosition = Vector3.zero;
+        headObj.SetActive(true);
+        return headObj.AddComponent<LineRendererHead>();
     }
 
     private void SubscribeToEvents()
     {
         if (_animation != null)
         {
-            _animation.OnAnimationStarted += HandleAnimationStarted;
             _animation.OnLinePositionsChanged += HandleLinePositionsChanged;
         }
     }
@@ -134,14 +125,10 @@ namespace _Game.Line
     {
         if (_animation != null)
         {
-            _animation.OnAnimationStarted -= HandleAnimationStarted;
             _animation.OnLinePositionsChanged -= HandleLinePositionsChanged;
         }
     }
 
-    private void HandleAnimationStarted(bool forwardDirection)
-    {
-    }
 
     private void HandleLinePositionsChanged()
     {
@@ -208,7 +195,7 @@ namespace _Game.Line
             _lineHead.OnHeadCollision -= HandleHeadCollision;
         }
         
-        if (LevelManager.Instance != null && 
+        if (LevelManager.IsInitialized && 
             LevelManager.Instance.ActiveLevelInstance != null && 
             LevelManager.Instance.ActiveLevelInstance.LineManager != null)
         {

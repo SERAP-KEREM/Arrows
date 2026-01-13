@@ -46,17 +46,7 @@ namespace _Game.Line
                 otherLine = other.transform.parent.GetComponent<Line>();
             }
 
-            if (otherLine == null && other.transform.parent != null && other.transform.parent.parent != null)
-            {
-                otherLine = other.transform.parent.parent.GetComponent<Line>();
-            }
-
-            if (otherLine == _ownLine)
-            {
-                return;
-            }
-
-            if (otherLine == null)
+            if (otherLine == null || otherLine == _ownLine)
             {
                 return;
             }

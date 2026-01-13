@@ -64,7 +64,6 @@ namespace _Game.Line
         {
             if (line != null)
             {
-                RegisterLine(line);
                 line.Initialize();
             }
         }
