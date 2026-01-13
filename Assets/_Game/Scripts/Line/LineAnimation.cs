@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.Serialization;
+using SerapKeremGameKit._Logging;
 
 namespace _Game.Line
 {
@@ -22,6 +23,7 @@ namespace _Game.Line
     public event Action<bool> OnAnimationStarted;
     public event Action OnAnimationStopped;
     public event Action OnAnimationCompleted;
+    public event Action OnLinePositionsChanged;
 
     public void Initialize(LineRenderer lineRenderer)
     {
@@ -68,6 +70,7 @@ namespace _Game.Line
             OnAnimationStarted?.Invoke(forwardDirection);
         }
     }
+
 
     public void Stop()
     {
@@ -136,6 +139,8 @@ namespace _Game.Line
         tailPoint += tailDirection.normalized * (speed * Time.deltaTime);
         line.SetPosition(0, tailPoint);
 
+        OnLinePositionsChanged?.Invoke();
+
         if (!(Vector3.Distance(tailPoint, line.GetPosition(1)) < 0.1f)) return;
 
         var newCount = count - 1;
@@ -162,6 +167,8 @@ namespace _Game.Line
         }
         _tempPositionsArray = null;
 
+        OnLinePositionsChanged?.Invoke();
+
         if (newCount < 2)
         {
             play = false;
@@ -174,13 +181,56 @@ namespace _Game.Line
         var countCurrent = line.positionCount;
         var countOrigin = positionsOrigin.Length;
 
-        var tailPosition = line.GetPosition(0);
-        var originTailPosition = positionsOrigin[0];
-        var isSameCount = countCurrent >= countOrigin;
-
-        if (isSameCount && Vector3.Distance(tailPosition, originTailPosition) < 0.1f)
+        if (countCurrent < countOrigin)
         {
+            var newCount = countCurrent + 1;
+            if (_arrayPool != null)
+            {
+                _tempPositionsArray = _arrayPool.GetArray(newCount);
+            }
+            else
+            {
+                _tempPositionsArray = new Vector3[newCount];
+            }
+
+            var indexTarget = countOrigin - newCount;
+            _tempPositionsArray[0] = positionsOrigin[indexTarget];
+            _tempPositionsArray[1] = positionsOrigin[indexTarget];
+            for (int i = 1; i < countCurrent; i++)
+            {
+                _tempPositionsArray[i + 1] = line.GetPosition(i);
+            }
+
+            line.positionCount = newCount;
+            line.SetPositions(_tempPositionsArray);
+            
+            if (_arrayPool != null)
+            {
+                _arrayPool.RecycleArray(_tempPositionsArray);
+            }
+            _tempPositionsArray = null;
+            
+            OnLinePositionsChanged?.Invoke();
+            return;
+        }
+
+        bool allPositionsClose = true;
+        for (int i = 0; i < countCurrent && i < countOrigin; i++)
+        {
+            var currentPos = line.GetPosition(i);
+            var originPos = positionsOrigin[i];
+            if (Vector3.Distance(currentPos, originPos) > 0.1f)
+            {
+                allPositionsClose = false;
+                break;
+            }
+        }
+
+        if (allPositionsClose && countCurrent == countOrigin)
+        {
+            line.SetPositions(positionsOrigin);
             play = false;
+            OnLinePositionsChanged?.Invoke();
             OnAnimationCompleted?.Invoke();
             return;
         }
@@ -188,10 +238,17 @@ namespace _Game.Line
         var positionHeadOrigin = positionsOrigin[positionsOrigin.Length - 1];
         var indexHead = countCurrent - 1;
         var positionHead = line.GetPosition(indexHead);
-
-        if (Vector3.Distance(positionHeadOrigin, positionHead) > 0.1f || !isSameCount)
+        var directionToOrigin = positionHeadOrigin - positionHead;
+        
+        if (Vector3.Distance(positionHeadOrigin, positionHead) > 0.1f)
         {
-            positionHead -= direction.normalized * (speed * Time.deltaTime);
+            positionHead += directionToOrigin.normalized * (speed * Time.deltaTime);
+            
+            if (Vector3.Dot(directionToOrigin, positionHeadOrigin - positionHead) < 0)
+            {
+                positionHead = positionHeadOrigin;
+            }
+            
             line.SetPosition(indexHead, positionHead);
         }
         else
@@ -199,42 +256,39 @@ namespace _Game.Line
             line.SetPosition(indexHead, positionHeadOrigin);
         }
 
-        var indexTarget = countOrigin - countCurrent;
         var positionTail = line.GetPosition(0);
-        var positionTailTarget = positionsOrigin[indexTarget];
+        var positionTailTarget = positionsOrigin[0];
         var directionTail = positionTailTarget - positionTail;
 
-        positionTail += directionTail.normalized * (speed * Time.deltaTime);
-        line.SetPosition(0, positionTail);
-
-        if (Vector3.Distance(positionTail, positionsOrigin[indexTarget]) >= 0.1f)
-            return;
-
-        var newCount = countCurrent + 1;
-        if (_arrayPool != null)
+        if (Vector3.Distance(positionTail, positionTailTarget) > 0.1f)
         {
-            _tempPositionsArray = _arrayPool.GetArray(newCount);
+            positionTail += directionTail.normalized * (speed * Time.deltaTime);
+            line.SetPosition(0, positionTail);
         }
         else
         {
-            _tempPositionsArray = new Vector3[newCount];
+            line.SetPosition(0, positionTailTarget);
         }
 
-        _tempPositionsArray[0] = positionsOrigin[indexTarget];
-        _tempPositionsArray[1] = positionsOrigin[indexTarget];
-        for (int i = 1; i < countCurrent; i++)
+        for (int i = 1; i < countCurrent - 1 && i < countOrigin - 1; i++)
         {
-            _tempPositionsArray[i + 1] = line.GetPosition(i);
+            var currentPos = line.GetPosition(i);
+            var targetPos = positionsOrigin[i];
+            var dir = targetPos - currentPos;
+            
+            if (Vector3.Distance(currentPos, targetPos) > 0.1f)
+            {
+                currentPos += dir.normalized * (speed * Time.deltaTime);
+                line.SetPosition(i, currentPos);
+            }
+            else
+            {
+                line.SetPosition(i, targetPos);
+            }
         }
 
-        line.positionCount = newCount;
-        line.SetPositions(_tempPositionsArray);
-        
-        if (_arrayPool != null)
-        {
-            _arrayPool.RecycleArray(_tempPositionsArray);
-        }
-        _tempPositionsArray = null;
+        OnLinePositionsChanged?.Invoke();
     }
+
 }
 }

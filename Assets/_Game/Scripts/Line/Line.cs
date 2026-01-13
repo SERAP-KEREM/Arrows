@@ -14,6 +14,7 @@ namespace _Game.Line
     [SerializeField] private LineHitChecker _hitChecker;
     [SerializeField] private LineDestroyer _destroyer;
     [SerializeField] private LineSegmentColliderSpawner2D _colliderSpawner;
+    [SerializeField] private LineRendererHead _lineHead;
 
     public LineRenderer LineRenderer => _lineRenderer;
     public LineAnimation Animation => _animation;
@@ -77,6 +78,47 @@ namespace _Game.Line
         {
             _colliderSpawner.Initialize(_lineRenderer);
         }
+
+        if (_lineHead == null)
+        {
+            _lineHead = GetComponentInChildren<LineRendererHead>(true);
+        }
+        
+        if (_lineHead == null)
+        {
+            LineRendererHead[] allHeads = FindObjectsByType<LineRendererHead>(FindObjectsSortMode.None);
+            foreach (var head in allHeads)
+            {
+                if (head != null && head.transform.IsChildOf(transform))
+                {
+                    _lineHead = head;
+                    break;
+                }
+            }
+        }
+        
+        if (_lineHead == null)
+        {
+            GameObject headObj = new GameObject("Head");
+            headObj.transform.SetParent(transform);
+            headObj.transform.localPosition = Vector3.zero;
+            headObj.SetActive(true);
+            _lineHead = headObj.AddComponent<LineRendererHead>();
+        }
+        else
+        {
+            if (_lineHead.gameObject != null)
+            {
+                _lineHead.gameObject.SetActive(true);
+            }
+        }
+
+        if (_lineHead != null && _lineHead.gameObject != null)
+        {
+            _lineHead.Initialize(_lineRenderer, this);
+            _lineHead.OnHeadCollision += HandleHeadCollision;
+            _lineHead.gameObject.SetActive(true);
+        }
     }
 
     private void SubscribeToEvents()
@@ -84,6 +126,7 @@ namespace _Game.Line
         if (_animation != null)
         {
             _animation.OnAnimationStarted += HandleAnimationStarted;
+            _animation.OnLinePositionsChanged += HandleLinePositionsChanged;
         }
     }
 
@@ -92,14 +135,43 @@ namespace _Game.Line
         if (_animation != null)
         {
             _animation.OnAnimationStarted -= HandleAnimationStarted;
+            _animation.OnLinePositionsChanged -= HandleLinePositionsChanged;
         }
     }
 
     private void HandleAnimationStarted(bool forwardDirection)
     {
+    }
+
+    private void HandleLinePositionsChanged()
+    {
         if (_colliderSpawner != null)
         {
-            _colliderSpawner.ClearSegments();
+            _colliderSpawner.UpdateSegments();
+        }
+    }
+
+    private void HandleHeadCollision(Collider2D other)
+    {
+        ReverseLine();
+    }
+
+    private void ReverseLine()
+    {
+        if (_animation != null)
+        {
+            _animation.Stop();
+            _animation.Play(forwardDirection: false);
+        }
+
+        if (_destroyer != null)
+        {
+            _destroyer.StopCountdown();
+        }
+
+        if (_hitChecker != null)
+        {
+            _hitChecker.StopChecking();
         }
     }
 
@@ -131,7 +203,14 @@ namespace _Game.Line
     {
         UnsubscribeFromEvents();
         
-        if (LevelManager.Instance.ActiveLevelInstance.LineManager)
+        if (_lineHead != null)
+        {
+            _lineHead.OnHeadCollision -= HandleHeadCollision;
+        }
+        
+        if (LevelManager.Instance != null && 
+            LevelManager.Instance.ActiveLevelInstance != null && 
+            LevelManager.Instance.ActiveLevelInstance.LineManager != null)
         {
             LevelManager.Instance.ActiveLevelInstance.LineManager.UnregisterLine(this);
         }

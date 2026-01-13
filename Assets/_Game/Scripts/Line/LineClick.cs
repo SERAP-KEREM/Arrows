@@ -107,7 +107,6 @@ namespace _Game.Line
         
         _lineDestroyer.StartCountdown();
         _animation.Play(forwardDirection: true);
-        _hitChecker.StartChecking();
     }
 }
 }
