@@ -207,8 +207,12 @@ namespace _Game.Line
 
     private void HandleAnimationStopped()
     {
-        _hasCollided = false;
-        _hasLostLifeForThisCollision = false;
+        if (_animation != null && _animation.IsForward)
+        {
+            _hasCollided = false;
+            _hasLostLifeForThisCollision = false;
+        }
+        
         if (_lineHead != null)
         {
             LineHeadCollisionDetector detector = _lineHead.GetComponent<LineHeadCollisionDetector>();
@@ -221,6 +225,17 @@ namespace _Game.Line
 
     private void HandleAnimationCompleted()
     {
+        if (_animation == null) return;
+
+        if (!_animation.IsForward)
+        {
+            _hasCollided = false;
+            _hasLostLifeForThisCollision = false;
+            return;
+        }
+
+        if (_hasCollided) return;
+
         if (LevelManager.IsInitialized && 
             LevelManager.Instance.ActiveLevelInstance != null && 
             LevelManager.Instance.ActiveLevelInstance.LineManager != null)

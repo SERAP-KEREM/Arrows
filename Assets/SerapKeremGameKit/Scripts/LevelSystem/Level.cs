@@ -111,6 +111,8 @@ namespace SerapKeremGameKit._LevelSystem
                 InputHandler.Instance.UnlockInput();
             }
 
+            _isLevelWon = false;
+
             if (LivesManager.IsInitialized)
             {
                 LivesManager.Instance.ResetLives();
@@ -119,7 +121,29 @@ namespace SerapKeremGameKit._LevelSystem
 
             if (_lineManager != null)
             {
+                RegisterAllLines();
                 _lineManager.OnAllLinesRemoved += HandleAllLinesRemoved;
+            }
+        }
+
+        private void RegisterAllLines()
+        {
+            if (_lineManager == null) return;
+
+            Line[] lines = GetComponentsInChildren<Line>(true);
+            if (lines != null && lines.Length > 0)
+            {
+                foreach (Line line in lines)
+                {
+                    if (line != null)
+                    {
+                        if (!line.IsInitialized)
+                        {
+                            line.Initialize();
+                        }
+                        _lineManager.RegisterLine(line);
+                    }
+                }
             }
         }
 
