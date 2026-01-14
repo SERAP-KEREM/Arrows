@@ -690,8 +690,8 @@ GameObject:
   - component: {fileID: 660198613}
   - component: {fileID: 660198615}
   - component: {fileID: 660198614}
-  - component: {fileID: 660198617}
   - component: {fileID: 660198616}
+  - component: {fileID: 660198617}
   m_Layer: 5
   m_Name: HeartPanel
   m_TagString: Untagged
