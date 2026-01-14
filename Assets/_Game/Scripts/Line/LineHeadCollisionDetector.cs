@@ -10,11 +10,13 @@ namespace _Game.Line
         
         private Line _ownLine;
         private bool _isInitialized;
+        private bool _hasCollided = false;
 
         public void Initialize(Line ownLine)
         {
             _ownLine = ownLine;
             _isInitialized = true;
+            _hasCollided = false;
             
             Collider2D col = GetComponent<Collider2D>();
             if (col != null)
@@ -25,19 +27,13 @@ namespace _Game.Line
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (!_isInitialized || _ownLine == null) return;
+            if (!_isInitialized || _ownLine == null || _hasCollided) return;
             CheckCollision(other);
-        }
-
-        private void OnCollisionEnter2D(Collision2D collision)
-        {
-            if (!_isInitialized || _ownLine == null) return;
-            CheckCollision(collision.collider);
         }
 
         private void CheckCollision(Collider2D other)
         {
-            if (other == null) return;
+            if (other == null || _hasCollided) return;
 
             Line otherLine = other.GetComponent<Line>();
             if (otherLine == null && other.transform.parent != null)
@@ -50,7 +46,13 @@ namespace _Game.Line
                 return;
             }
 
+            _hasCollided = true;
             OnHeadCollision?.Invoke(other);
+        }
+
+        public void ResetCollision()
+        {
+            _hasCollided = false;
         }
     }
 }

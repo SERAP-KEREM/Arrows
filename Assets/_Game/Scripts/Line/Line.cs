@@ -1,6 +1,7 @@
 using UnityEngine;
 using SerapKeremGameKit._Logging;
 using SerapKeremGameKit._Managers;
+using _Game.UI;
 
 namespace _Game.Line
 {
@@ -21,6 +22,10 @@ namespace _Game.Line
     public LineAnimation Animation => _animation;
     public LineClick Click => _click;
     public bool IsInitialized { get; private set; }
+    public bool IsClickable => !_hasCollided && (_animation == null || !_animation.IsPlaying || (_animation.IsPlaying && _animation.IsForward));
+
+    private bool _hasCollided = false;
+    private bool _hasLostLifeForThisCollision = false;
 
     private void ValidateComponents()
     {
@@ -138,6 +143,8 @@ namespace _Game.Line
             _lineHead.gameObject.SetActive(true);
             _lineHead.Initialize(_lineRenderer, this);
             _lineHead.OnHeadCollision += HandleHeadCollision;
+            _hasCollided = false;
+            _hasLostLifeForThisCollision = false;
         }
     }
 
@@ -156,6 +163,7 @@ namespace _Game.Line
         {
             _animation.OnLinePositionsChanged += HandleLinePositionsChanged;
             _animation.OnAnimationStarted += HandleAnimationStarted;
+            _animation.OnAnimationStopped += HandleAnimationStopped;
         }
     }
 
@@ -165,6 +173,7 @@ namespace _Game.Line
         {
             _animation.OnLinePositionsChanged -= HandleLinePositionsChanged;
             _animation.OnAnimationStarted -= HandleAnimationStarted;
+            _animation.OnAnimationStopped -= HandleAnimationStopped;
         }
     }
 
@@ -179,15 +188,46 @@ namespace _Game.Line
 
     private void HandleAnimationStarted(bool forwardDirection)
     {
+        if (forwardDirection)
+        {
+            _hasCollided = false;
+            _hasLostLifeForThisCollision = false;
+            if (_lineHead != null)
+            {
+                LineHeadCollisionDetector detector = _lineHead.GetComponent<LineHeadCollisionDetector>();
+                if (detector != null)
+                {
+                    detector.ResetCollision();
+                }
+            }
+        }
+    }
+
+    private void HandleAnimationStopped()
+    {
+        _hasCollided = false;
+        _hasLostLifeForThisCollision = false;
+        if (_lineHead != null)
+        {
+            LineHeadCollisionDetector detector = _lineHead.GetComponent<LineHeadCollisionDetector>();
+            if (detector != null)
+            {
+                detector.ResetCollision();
+            }
+        }
     }
 
     private void HandleHeadCollision(Collider2D other)
     {
+        if (_hasCollided) return;
         ReverseLine();
     }
 
     private void ReverseLine()
     {
+        if (_hasCollided) return;
+        _hasCollided = true;
+
         if (_animation != null)
         {
             _animation.Stop();
@@ -207,6 +247,12 @@ namespace _Game.Line
         if (_materialHandler != null)
         {
             _materialHandler.SetFailureColor();
+        }
+
+        if (!_hasLostLifeForThisCollision && LivesManager.IsInitialized)
+        {
+            _hasLostLifeForThisCollision = true;
+            LivesManager.Instance.LoseLife();
         }
     }
 

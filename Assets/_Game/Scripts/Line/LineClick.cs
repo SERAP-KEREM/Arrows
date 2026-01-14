@@ -9,6 +9,7 @@ namespace _Game.Line
     private LineAnimation _animation;
     private LineHitChecker _hitChecker;
     private LineDestroyer _lineDestroyer;
+    private Line _ownLine;
     private bool _isInitialized;
 
     public event Action<Vector3> OnLineSelected;
@@ -19,6 +20,11 @@ namespace _Game.Line
         _hitChecker = hitChecker;
         _lineDestroyer = lineDestroyer;
         _isInitialized = true;
+
+        if (_ownLine == null)
+        {
+            _ownLine = GetComponent<Line>();
+        }
 
         SubscribeToEvents();
     }
@@ -101,6 +107,9 @@ namespace _Game.Line
     public void OnSelected(Vector3 worldPosition)
     {
         if (!_isInitialized || _animation == null || _lineDestroyer == null || _hitChecker == null)
+            return;
+
+        if (_ownLine != null && !_ownLine.IsClickable)
             return;
         
         OnLineSelected?.Invoke(worldPosition);
