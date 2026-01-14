@@ -1,3 +1,5 @@
+using _Game.UI;
+
 namespace SerapKeremGameKit._Levels
 {
     public static class StarEvaluator
@@ -23,6 +25,19 @@ namespace SerapKeremGameKit._Levels
             if (t <= config.TimeThresholdsSec[0]) return 3;
             if (t <= config.TimeThresholdsSec[1]) return 2;
             if (t <= config.TimeThresholdsSec[2]) return 1;
+            return 0;
+        }
+
+        public static int EvaluateStarsByLives()
+        {
+            if (!LivesManager.IsInitialized)
+                return 0;
+
+            int currentLives = LivesManager.Instance.CurrentLives;
+
+            if (currentLives >= 5) return 3;
+            if (currentLives >= 3) return 2;
+            if (currentLives >= 1) return 0;
             return 0;
         }
     }

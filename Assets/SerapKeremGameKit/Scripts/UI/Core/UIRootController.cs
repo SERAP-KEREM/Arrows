@@ -120,9 +120,7 @@ namespace SerapKeremGameKit._UI
                 Level active = LevelManager.Instance.ActiveLevelInstance;
                 LevelConfig config = ResolveConfig(active);
 
-                // Calculate completion time: levelTime - remainingTime
-                float completionTime = CalculateCompletionTime(active);
-                int stars = StarEvaluator.EvaluateStars(config, completionTime);
+                int stars = StarEvaluator.EvaluateStarsByLives();
                 int reward = Mathf.Max(0, config != null ? config.WinCoins : 10);
                 int totalBefore = 0;
                 if (CurrencyWallet.Instance != null)
