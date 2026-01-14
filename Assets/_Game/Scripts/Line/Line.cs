@@ -164,6 +164,7 @@ namespace _Game.Line
             _animation.OnLinePositionsChanged += HandleLinePositionsChanged;
             _animation.OnAnimationStarted += HandleAnimationStarted;
             _animation.OnAnimationStopped += HandleAnimationStopped;
+            _animation.OnAnimationCompleted += HandleAnimationCompleted;
         }
     }
 
@@ -174,6 +175,7 @@ namespace _Game.Line
             _animation.OnLinePositionsChanged -= HandleLinePositionsChanged;
             _animation.OnAnimationStarted -= HandleAnimationStarted;
             _animation.OnAnimationStopped -= HandleAnimationStopped;
+            _animation.OnAnimationCompleted -= HandleAnimationCompleted;
         }
     }
 
@@ -214,6 +216,16 @@ namespace _Game.Line
             {
                 detector.ResetCollision();
             }
+        }
+    }
+
+    private void HandleAnimationCompleted()
+    {
+        if (LevelManager.IsInitialized && 
+            LevelManager.Instance.ActiveLevelInstance != null && 
+            LevelManager.Instance.ActiveLevelInstance.LineManager != null)
+        {
+            LevelManager.Instance.ActiveLevelInstance.LineManager.UnregisterLine(this);
         }
     }
 

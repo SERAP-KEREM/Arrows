@@ -116,11 +116,21 @@ namespace SerapKeremGameKit._LevelSystem
                 LivesManager.Instance.ResetLives();
                 LivesManager.Instance.OnLivesDepleted += HandleLivesDepleted;
             }
+
+            if (_lineManager != null)
+            {
+                _lineManager.OnAllLinesRemoved += HandleAllLinesRemoved;
+            }
         }
 
         private void HandleLivesDepleted()
         {
             CheckLoseCondition();
+        }
+
+        private void HandleAllLinesRemoved()
+        {
+            CheckWinCondition();
         }
 
         public void CheckWinCondition()
@@ -160,6 +170,11 @@ namespace SerapKeremGameKit._LevelSystem
             if (LivesManager.IsInitialized)
             {
                 LivesManager.Instance.OnLivesDepleted -= HandleLivesDepleted;
+            }
+
+            if (_lineManager != null)
+            {
+                _lineManager.OnAllLinesRemoved -= HandleAllLinesRemoved;
             }
         }
     }

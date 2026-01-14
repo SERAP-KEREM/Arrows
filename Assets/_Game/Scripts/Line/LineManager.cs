@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using SerapKeremGameKit._Logging;
@@ -15,6 +16,8 @@ namespace _Game.Line
     public int ActiveLineCount => _activeLines.Count;
 
     public IReadOnlyList<Line> ActiveLines => _activeLines;
+
+    public event Action OnAllLinesRemoved;
 
     public void InitializeLines(Transform levelRoot)
     {
@@ -84,6 +87,11 @@ namespace _Game.Line
         if (line == null) return;
 
         _activeLines.Remove(line);
+
+        if (_activeLines.Count == 0)
+        {
+            OnAllLinesRemoved?.Invoke();
+        }
     }
 
     public void ClearLines()
