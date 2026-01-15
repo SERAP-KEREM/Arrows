@@ -11,7 +11,6 @@ namespace _Game.Line
     [SerializeField] private LineRenderer _lineRenderer;
     [SerializeField] private LineAnimation _animation;
     [SerializeField] private LineClick _click;
-    [SerializeField] private LineHitChecker _hitChecker;
     [SerializeField] private LineDestroyer _destroyer;
     [SerializeField] private LineSegmentColliderSpawner2D _colliderSpawner;
     [SerializeField] private LineRendererHead _lineHead;
@@ -105,7 +104,7 @@ namespace _Game.Line
 
         if (_click != null)
         {
-            _click.Initialize(_animation, _hitChecker, _destroyer, this);
+            _click.Initialize(_animation, _destroyer, this);
         }
 
         if (_colliderSpawner != null)
@@ -235,11 +234,6 @@ namespace _Game.Line
             _destroyer.StopCountdown();
         }
 
-        if (_hitChecker != null)
-        {
-            _hitChecker.StopChecking();
-        }
-
         if (_materialHandler != null)
         {
             _materialHandler.SetFailureColor();
@@ -266,11 +260,6 @@ namespace _Game.Line
         if (_destroyer != null)
         {
             _destroyer.StopCountdown();
-        }
-
-        if (_hitChecker != null)
-        {
-            _hitChecker.StopChecking();
         }
 
         if (_animation != null)

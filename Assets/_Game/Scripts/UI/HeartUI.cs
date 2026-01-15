@@ -19,6 +19,7 @@ namespace _Game.UI
         {
             _isActive = active;
 
+            if (_heartImage == null) return;
             
             if (active)
             {
@@ -34,7 +35,6 @@ namespace _Game.UI
                     _heartImage.sprite = _grayHeartSprite;
                 }
             }
-
         }
 
         public void Initialize()

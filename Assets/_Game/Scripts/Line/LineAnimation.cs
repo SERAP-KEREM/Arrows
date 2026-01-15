@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace _Game.Line
 {
@@ -12,9 +11,8 @@ namespace _Game.Line
     private bool _isPlaying;
     private bool _forward;
     private Vector3 _direction;
-    [FormerlySerializedAs("positions")] private Vector3[] positionsOrigin;
+    private Vector3[] positionsOrigin;
     private bool _isInitialized;
-    private bool _wasPlaying;
     private Vector3[] _tempPositionsArray;
     private Vector3ArrayPool _arrayPool;
 

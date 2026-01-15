@@ -9,16 +9,12 @@ namespace _Game.Line
     [SerializeField] private Line _ownLine;
 
     private LineAnimation _animation;
-    private LineHitChecker _hitChecker;
     private LineDestroyer _lineDestroyer;
     private bool _isInitialized;
 
-    public event Action<Vector3> OnLineSelected;
-
-    public void Initialize(LineAnimation animation, LineHitChecker hitChecker, LineDestroyer lineDestroyer, Line ownLine = null)
+    public void Initialize(LineAnimation animation, LineDestroyer lineDestroyer, Line ownLine = null)
     {
         _animation = animation;
-        _hitChecker = hitChecker;
         _lineDestroyer = lineDestroyer;
         
         if (ownLine != null)
@@ -32,11 +28,6 @@ namespace _Game.Line
 
     private void SubscribeToEvents()
     {
-        if (_hitChecker != null)
-        {
-        _hitChecker.OnLineHit += HandleLineHit;
-        }
-
         if (_animation != null)
         {
             _animation.OnAnimationStopped += HandleAnimationStopped;
@@ -55,11 +46,6 @@ namespace _Game.Line
 
     private void UnsubscribeFromEvents()
     {
-        if (_hitChecker != null)
-        {
-            _hitChecker.OnLineHit -= HandleLineHit;
-        }
-
         if (_animation != null)
         {
             _animation.OnAnimationStopped -= HandleAnimationStopped;
@@ -71,25 +57,8 @@ namespace _Game.Line
         }
     }
 
-    private void HandleLineHit()
-    {
-        if (_animation != null)
-    {
-        _animation.Play(forwardDirection: false);
-        }
-        
-        if (_lineDestroyer != null)
-        {
-        _lineDestroyer.StopCountdown();
-    }
-    }
-
     private void HandleAnimationStopped()
     {
-        if (_hitChecker != null)
-        {
-            _hitChecker.StopChecking();
-        }
     }
 
     private void HandleLineDestroyed()
@@ -98,22 +67,15 @@ namespace _Game.Line
         {
             _animation.Stop();
         }
-
-        if (_hitChecker != null)
-        {
-            _hitChecker.StopChecking();
-        }
     }
 
     public void OnSelected(Vector3 worldPosition)
     {
-        if (!_isInitialized || _animation == null || _lineDestroyer == null || _hitChecker == null)
+        if (!_isInitialized || _animation == null || _lineDestroyer == null)
             return;
 
         if (_ownLine != null && !_ownLine.IsClickable)
             return;
-        
-        OnLineSelected?.Invoke(worldPosition);
         
         _lineDestroyer.StartCountdown();
         _animation.Play(forwardDirection: true);

@@ -111,19 +111,6 @@ namespace _Game.Line
         _activeLines.Clear();
     }
 
-    public void DestroyAllLines()
-    {
-        for (int i = _activeLines.Count - 1; i >= 0; i--)
-        {
-            if (_activeLines[i] != null)
-            {
-                Destroy(_activeLines[i].gameObject);
-            }
-        }
-
-        _activeLines.Clear();
-    }
-
     public Line GetLineByIndex(int index)
     {
         if (index < 0 || index >= _activeLines.Count)
