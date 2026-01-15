@@ -35,12 +35,7 @@ namespace _Game.Line
         {
             if (other == null || _hasCollided) return;
 
-            Line otherLine = other.GetComponent<Line>();
-            if (otherLine == null && other.transform.parent != null)
-            {
-                otherLine = other.transform.parent.GetComponent<Line>();
-            }
-
+            Line otherLine = GetLineFromCollider(other);
             if (otherLine == null || otherLine == _ownLine)
             {
                 return;
@@ -48,6 +43,18 @@ namespace _Game.Line
 
             _hasCollided = true;
             OnHeadCollision?.Invoke(other);
+        }
+
+        private static Line GetLineFromCollider(Collider2D collider)
+        {
+            if (collider == null) return null;
+
+            Line line = collider.GetComponent<Line>();
+            if (line == null && collider.transform.parent != null)
+            {
+                line = collider.transform.parent.GetComponent<Line>();
+            }
+            return line;
         }
 
         public void ResetCollision()

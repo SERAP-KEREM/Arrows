@@ -7,12 +7,14 @@ namespace _Game.UI
 {
     public class LivesManager : MonoSingleton<LivesManager>
     {
-        private const int MaxLives = 5;
+        [Header("Lives Settings")]
+        [SerializeField] private int _maxLives = 5;
+        
         private int _currentLives;
         private int _lastLifeLossFrame = -1;
 
         public int CurrentLives => _currentLives;
-        public int MaxLivesCount => MaxLives;
+        public int MaxLivesCount => _maxLives;
 
         public event Action<int> OnLivesChanged;
         public event Action OnLivesDepleted;
@@ -29,7 +31,7 @@ namespace _Game.UI
 
         public void ResetLives()
         {
-            _currentLives = MaxLives;
+            _currentLives = _maxLives;
             _lastLifeLossFrame = -1;
             OnLivesChanged?.Invoke(_currentLives);
         }

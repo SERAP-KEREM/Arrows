@@ -9,16 +9,28 @@ namespace _Game.UI
         [Header("Heart References")]
         [SerializeField] private List<HeartUI> _hearts = new List<HeartUI>();
 
-        private const int MaxHearts = 5;
         private bool _isInitialized = false;
+
+        private int MaxHearts
+        {
+            get
+            {
+                if (LivesManager.IsInitialized && LivesManager.Instance != null)
+                {
+                    return LivesManager.Instance.MaxLivesCount;
+                }
+                return 5; // Fallback default
+            }
+        }
 
         public void Initialize()
         {
             if (_isInitialized) return;
 
-            if (_hearts.Count != MaxHearts)
+            int expectedHearts = MaxHearts;
+            if (_hearts.Count != expectedHearts)
             {
-                Debug.LogWarning($"{name}: Expected {MaxHearts} hearts, but found {_hearts.Count}. Please assign {MaxHearts} HeartUI components in Inspector.", this);
+                Debug.LogWarning($"{name}: Expected {expectedHearts} hearts, but found {_hearts.Count}. Please assign {expectedHearts} HeartUI components in Inspector.", this);
             }
 
             foreach (var heart in _hearts)

@@ -27,6 +27,7 @@ namespace _Game.Line
     private Vector3ArrayPool _arrayPool;
     private bool _hasCollided = false;
     private bool _hasLostLifeForThisCollision = false;
+    private LineHeadCollisionDetector _headCollisionDetector;
 
     private void ValidateComponents()
     {
@@ -122,8 +123,17 @@ namespace _Game.Line
             _lineHead.gameObject.SetActive(true);
             _lineHead.Initialize(_lineRenderer, this);
             _lineHead.OnHeadCollision += HandleHeadCollision;
+            _headCollisionDetector = _lineHead.GetComponent<LineHeadCollisionDetector>();
             _hasCollided = false;
             _hasLostLifeForThisCollision = false;
+        }
+    }
+
+    private void ResetHeadCollision()
+    {
+        if (_headCollisionDetector != null)
+        {
+            _headCollisionDetector.ResetCollision();
         }
     }
 
@@ -164,14 +174,7 @@ namespace _Game.Line
         {
             _hasCollided = false;
             _hasLostLifeForThisCollision = false;
-            if (_lineHead != null)
-            {
-                LineHeadCollisionDetector detector = _lineHead.GetComponent<LineHeadCollisionDetector>();
-                if (detector != null)
-                {
-                    detector.ResetCollision();
-                }
-            }
+            ResetHeadCollision();
         }
     }
 
@@ -183,14 +186,7 @@ namespace _Game.Line
             _hasLostLifeForThisCollision = false;
         }
         
-        if (_lineHead != null)
-        {
-            LineHeadCollisionDetector detector = _lineHead.GetComponent<LineHeadCollisionDetector>();
-            if (detector != null)
-            {
-                detector.ResetCollision();
-            }
-        }
+        ResetHeadCollision();
     }
 
     private void HandleAnimationCompleted()

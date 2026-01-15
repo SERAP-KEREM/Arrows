@@ -47,14 +47,9 @@ namespace SerapKeremGameKit._LevelSystem
             UnsubscribeFromEvents();
             Initialize();
         }
+
         private void Initialize()
         {
-            StartCoroutine(InitializeCoroutine());
-
-        }
-        private IEnumerator InitializeCoroutine()
-        {
-            yield return new WaitForSeconds(0.1f);
             InitializeCamera();
             InitializeLines();
         }
@@ -107,7 +102,6 @@ namespace SerapKeremGameKit._LevelSystem
 
             if (_lineManager != null)
             {
-                RegisterAllLines();
                 _lineManager.OnAllLinesRemoved += HandleAllLinesRemoved;
             }
 
@@ -168,29 +162,6 @@ namespace SerapKeremGameKit._LevelSystem
             TraceLogger.LogWarning("LivesManager is not initialized after multiple attempts. Fail condition may not work.", this);
         }
 
-        private void RegisterAllLines()
-        {
-            if (_lineManager == null) return;
-
-            Line[] lines = GetComponentsInChildren<Line>(true);
-            if (lines != null && lines.Length > 0)
-            {
-                foreach (Line line in lines)
-                {
-                    if (line != null)
-                    {
-                        if (!line.IsInitialized)
-                        {
-                            line.Initialize(_lineManager);
-                        }
-                        else
-                        {
-                            _lineManager.RegisterLine(line);
-                        }
-                    }
-                }
-            }
-        }
 
         private void HandleLivesDepleted()
         {
