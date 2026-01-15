@@ -6,6 +6,7 @@ using SerapKeremGameKit._Time;
 using UnityEngine;
 using SerapKeremGameKit._Audio;
 using SerapKeremGameKit._Haptics;
+using _Game.UI;
 
 namespace SerapKeremGameKit._UI
 {
@@ -249,6 +250,18 @@ namespace SerapKeremGameKit._UI
             if (_hud != null)
             {
                 _hud.UpdateTimeDisplay(remainingTime);
+            }
+        }
+
+        public LivesManager LivesManagerInstance
+        {
+            get
+            {
+                if (LivesManager.IsInitialized)
+                {
+                    return LivesManager.Instance;
+                }
+                return null;
             }
         }
     }

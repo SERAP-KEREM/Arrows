@@ -67,7 +67,7 @@ namespace _Game.Line
         {
             if (line != null)
             {
-                line.Initialize();
+                line.Initialize(this);
             }
         }
     }

@@ -47,17 +47,17 @@ namespace SerapKeremGameKit._UI
 
         private void SubscribeToLivesManager()
         {
-            if (LivesManager.IsInitialized)
+            if (_uiRoot != null && _uiRoot.LivesManagerInstance != null)
             {
-                LivesManager.Instance.OnLivesChanged += HandleLivesChanged;
+                _uiRoot.LivesManagerInstance.OnLivesChanged += HandleLivesChanged;
             }
         }
 
         private void UnsubscribeFromLivesManager()
         {
-            if (LivesManager.IsInitialized)
+            if (_uiRoot != null && _uiRoot.LivesManagerInstance != null)
             {
-                LivesManager.Instance.OnLivesChanged -= HandleLivesChanged;
+                _uiRoot.LivesManagerInstance.OnLivesChanged -= HandleLivesChanged;
             }
         }
 
@@ -66,9 +66,9 @@ namespace SerapKeremGameKit._UI
             if (_heartPanel != null)
             {
                 _heartPanel.Initialize();
-                if (LivesManager.IsInitialized)
+                if (_uiRoot != null && _uiRoot.LivesManagerInstance != null)
                 {
-                    _heartPanel.UpdateHearts(LivesManager.Instance.CurrentLives);
+                    _heartPanel.UpdateHearts(_uiRoot.LivesManagerInstance.CurrentLives);
                 }
             }
         }

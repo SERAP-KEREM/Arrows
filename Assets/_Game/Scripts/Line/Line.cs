@@ -1,6 +1,5 @@
 using UnityEngine;
 using SerapKeremGameKit._Logging;
-using SerapKeremGameKit._Managers;
 using _Game.UI;
 
 namespace _Game.Line
@@ -24,6 +23,7 @@ namespace _Game.Line
     public bool IsInitialized { get; private set; }
     public bool IsClickable => !_hasCollided && (_animation == null || !_animation.IsPlaying || (_animation.IsPlaying && _animation.IsForward));
 
+    private LineManager _lineManager;
     private bool _hasCollided = false;
     private bool _hasLostLifeForThisCollision = false;
 
@@ -35,13 +35,21 @@ namespace _Game.Line
         }
     }
 
-    public void Initialize()
+    public void Initialize(LineManager lineManager)
     {
         if (IsInitialized)
         {
             TraceLogger.LogWarning($"{name} is already initialized.", this);
             return;
         }
+
+        if (lineManager == null)
+        {
+            TraceLogger.LogError($"Cannot initialize {name}: LineManager is null.", this);
+            return;
+        }
+
+        _lineManager = lineManager;
 
         ValidateComponents();
 
@@ -64,11 +72,9 @@ namespace _Game.Line
 
         IsInitialized = true;
 
-        if (LevelManager.IsInitialized && 
-            LevelManager.Instance.ActiveLevelInstance != null && 
-            LevelManager.Instance.ActiveLevelInstance.LineManager != null)
+        if (_lineManager != null)
         {
-            LevelManager.Instance.ActiveLevelInstance.LineManager.RegisterLine(this);
+            _lineManager.RegisterLine(this);
         }
     }
 
@@ -236,11 +242,9 @@ namespace _Game.Line
 
         if (_hasCollided) return;
 
-        if (LevelManager.IsInitialized && 
-            LevelManager.Instance.ActiveLevelInstance != null && 
-            LevelManager.Instance.ActiveLevelInstance.LineManager != null)
+        if (_lineManager != null)
         {
-            LevelManager.Instance.ActiveLevelInstance.LineManager.UnregisterLine(this);
+            _lineManager.UnregisterLine(this);
         }
     }
 
@@ -321,11 +325,9 @@ namespace _Game.Line
             _lineHead.OnHeadCollision -= HandleHeadCollision;
         }
         
-        if (LevelManager.IsInitialized && 
-            LevelManager.Instance.ActiveLevelInstance != null && 
-            LevelManager.Instance.ActiveLevelInstance.LineManager != null)
+        if (_lineManager != null)
         {
-            LevelManager.Instance.ActiveLevelInstance.LineManager.UnregisterLine(this);
+            _lineManager.UnregisterLine(this);
         }
     }
 }

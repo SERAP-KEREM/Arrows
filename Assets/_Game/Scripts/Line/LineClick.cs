@@ -33,7 +33,7 @@ namespace _Game.Line
     {
         if (_hitChecker != null)
         {
-            _hitChecker.OnLineHit += HandleLineHit;
+        _hitChecker.OnLineHit += HandleLineHit;
         }
 
         if (_animation != null)
@@ -73,14 +73,14 @@ namespace _Game.Line
     private void HandleLineHit()
     {
         if (_animation != null)
-        {
-            _animation.Play(forwardDirection: false);
+    {
+        _animation.Play(forwardDirection: false);
         }
         
         if (_lineDestroyer != null)
         {
-            _lineDestroyer.StopCountdown();
-        }
+        _lineDestroyer.StopCountdown();
+    }
     }
 
     private void HandleAnimationStopped()
@@ -117,5 +117,5 @@ namespace _Game.Line
         _lineDestroyer.StartCountdown();
         _animation.Play(forwardDirection: true);
     }
-}
+    }
 }

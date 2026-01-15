@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace _Game.Line
 {
-    public class LineSegmentColliderSpawner2D : MonoBehaviour
+public class LineSegmentColliderSpawner2D : MonoBehaviour
 {
     [Header("References")]
     private LineRenderer lineRenderer;
@@ -174,5 +174,5 @@ namespace _Game.Line
             }
         }
     }
-}
+    }
 }

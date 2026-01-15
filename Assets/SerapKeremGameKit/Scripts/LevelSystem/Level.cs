@@ -16,8 +16,6 @@ namespace SerapKeremGameKit._LevelSystem
     public class Level : MonoBehaviour
     {
 
-        // [Title("Coins Settings")] // coin settings can be added here if level-specific
-
         [Title("Grid Settings"), PropertyOrder(2)]
         [SerializeField] private Array2DInt _tileSizeArray;
 
@@ -38,15 +36,14 @@ namespace SerapKeremGameKit._LevelSystem
 
         [SerializeField] private LineManager _lineManager;
         public LineManager LineManager { get => _lineManager; set => _lineManager = value; }
-        // [SerializeField] private Transform _levelCameraPoint;
-
-        // [SerializeField] private float _currentLevelSize = 0f;
         public virtual void Load()
         {
             gameObject.SetActive(true);
             _isLevelWon = false;
             if (_winCoroutine != null) { StopCoroutine(_winCoroutine); _winCoroutine = null; }
             if (_loseCoroutine != null) { StopCoroutine(_loseCoroutine); _loseCoroutine = null; }
+            
+            UnsubscribeFromEvents();
             Initialize();
         }
         private void Initialize()
@@ -63,9 +60,9 @@ namespace SerapKeremGameKit._LevelSystem
 
         private void InitializeLines()
         {
-            if (LevelManager.Instance.ActiveLevelInstance.LineManager)
+            if (_lineManager != null)
             {
-                LevelManager.Instance.ActiveLevelInstance.LineManager.InitializeLines(transform);
+                _lineManager.InitializeLines(transform);
             }
             else
             {
@@ -77,31 +74,9 @@ namespace SerapKeremGameKit._LevelSystem
         {
             if (CameraManager.Instance == null)
             {
-                TraceLogger.LogError("CameraManager.Instance is null! Cannot initialize camera position.");
+                TraceLogger.LogError("CameraManager.Instance is null! Cannot initialize camera position.", this);
                 return;
             }
-
-            //InitializeCameraPosition 
-            //if (_levelCameraCampoint != null)
-            //{
-            //    CameraManager.Instance.InitializeCameraPosition(_levelCameraCampoint);
-            //    RichLogger.Log($"Level Loaded: Camera positioned to {_levelCameraCampoint.name} in {gameObject.name}");
-            //}
-            //else
-            //{
-            //    RichLogger.LogWarning($"Level Load Warning: '_levelCameraCampoint' is not assigned for {gameObject.name}. Camera position might be incorrect.");
-            //}
-
-            //AdjustCameraByLevelSize
-            //if (_currentLevelSize != 0)
-            //{
-            //    CameraManager.Instance.AdjustCameraByLevelSize(_currentLevelSize); 
-            //    RichLogger.Log($"Level Loaded: Camera adjusted by level size: {_currentLevelSize} in {gameObject.name}");
-            //}
-            //else
-            //{
-            //    Debug.LogError("Level Load Error: CameraManager instance is not found! Ensure it's present and initialized.");
-            //}
         }
 
         public virtual void Play()
@@ -112,18 +87,73 @@ namespace SerapKeremGameKit._LevelSystem
             }
 
             _isLevelWon = false;
-
-            if (LivesManager.IsInitialized)
-            {
-                LivesManager.Instance.ResetLives();
-                LivesManager.Instance.OnLivesDepleted += HandleLivesDepleted;
+            
+            if (_winCoroutine != null) 
+            { 
+                StopCoroutine(_winCoroutine); 
+                _winCoroutine = null; 
             }
+            
+            if (_loseCoroutine != null) 
+            { 
+                StopCoroutine(_loseCoroutine); 
+                _loseCoroutine = null; 
+            }
+
+            UnsubscribeFromEvents();
+
+            SubscribeToLivesManager();
 
             if (_lineManager != null)
             {
                 RegisterAllLines();
                 _lineManager.OnAllLinesRemoved += HandleAllLinesRemoved;
             }
+        }
+
+        private void SubscribeToLivesManager()
+        {
+            if (LivesManager.IsInitialized && LivesManager.Instance != null)
+            {
+                LivesManager.Instance.ResetLives();
+                LivesManager.Instance.OnLivesDepleted += HandleLivesDepleted;
+                
+                if (LivesManager.Instance.CurrentLives <= 0)
+                {
+                    HandleLivesDepleted();
+                }
+            }
+            else
+            {
+                StartCoroutine(SubscribeToLivesManagerCoroutine());
+            }
+        }
+
+        private IEnumerator SubscribeToLivesManagerCoroutine()
+        {
+            int maxAttempts = 10;
+            int attempts = 0;
+            
+            while (attempts < maxAttempts)
+            {
+                if (LivesManager.IsInitialized && LivesManager.Instance != null)
+                {
+                    LivesManager.Instance.ResetLives();
+                    LivesManager.Instance.OnLivesDepleted += HandleLivesDepleted;
+                    
+                    if (LivesManager.Instance.CurrentLives <= 0)
+                    {
+                        HandleLivesDepleted();
+                    }
+                    
+                    yield break;
+                }
+                
+                yield return null;
+                attempts++;
+            }
+
+            TraceLogger.LogWarning("LivesManager is not initialized after multiple attempts. Fail condition may not work.", this);
         }
 
         private void RegisterAllLines()
@@ -139,9 +169,12 @@ namespace SerapKeremGameKit._LevelSystem
                     {
                         if (!line.IsInitialized)
                         {
-                            line.Initialize();
+                            line.Initialize(_lineManager);
                         }
-                        _lineManager.RegisterLine(line);
+                        else
+                        {
+                            _lineManager.RegisterLine(line);
+                        }
                     }
                 }
             }
@@ -149,6 +182,7 @@ namespace SerapKeremGameKit._LevelSystem
 
         private void HandleLivesDepleted()
         {
+            if (_loseCoroutine != null) return;
             CheckLoseCondition();
         }
 
@@ -169,8 +203,6 @@ namespace SerapKeremGameKit._LevelSystem
         {
             if (InputHandler.Instance != null) InputHandler.Instance.LockInput();
             yield return new WaitForSeconds(0.5f);
-            // Example: reward coins for win
-            // int coins = PlayerPrefs.GetInt("skgk.currency.coins", 0) + 10; PlayerPrefs.SetInt("skgk.currency.coins", coins); PlayerPrefs.Save();
             LevelManager.Instance.Win();
         }
 
@@ -189,9 +221,9 @@ namespace SerapKeremGameKit._LevelSystem
             LevelManager.Instance.Lose();
         }
 
-        private void OnDestroy()
+        private void UnsubscribeFromEvents()
         {
-            if (LivesManager.IsInitialized)
+            if (LivesManager.IsInitialized && LivesManager.Instance != null)
             {
                 LivesManager.Instance.OnLivesDepleted -= HandleLivesDepleted;
             }
@@ -200,6 +232,11 @@ namespace SerapKeremGameKit._LevelSystem
             {
                 _lineManager.OnAllLinesRemoved -= HandleAllLinesRemoved;
             }
+        }
+
+        private void OnDestroy()
+        {
+            UnsubscribeFromEvents();
         }
     }
 }
