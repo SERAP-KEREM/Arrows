@@ -261,7 +261,8 @@ MonoBehaviour:
   _destroyer: {fileID: 579988495362921800}
   _colliderSpawner: {fileID: 3898713965489042308}
   _lineHead: {fileID: 1227772318919715864}
-  _materialHandler: {fileID: 0}
+  _lineHeadSpriteRenderer: {fileID: 4594035126425610268}
+  _materialHandler: {fileID: 8190878419885716933}
 --- !u!114 &2889735952934244776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -313,6 +314,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8110f990acb5144e901e74e31cd3722, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _ownLine: {fileID: 0}
 --- !u!114 &5917618282005337659
 MonoBehaviour:
   m_ObjectHideFlags: 0

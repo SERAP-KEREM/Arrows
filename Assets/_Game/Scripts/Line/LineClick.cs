@@ -6,26 +6,27 @@ namespace _Game.Line
 {
     public class LineClick : MonoBehaviour, ISelectable
 {
+    [SerializeField] private Line _ownLine;
+
     private LineAnimation _animation;
     private LineHitChecker _hitChecker;
     private LineDestroyer _lineDestroyer;
-    private Line _ownLine;
     private bool _isInitialized;
 
     public event Action<Vector3> OnLineSelected;
 
-    public void Initialize(LineAnimation animation, LineHitChecker hitChecker, LineDestroyer lineDestroyer)
+    public void Initialize(LineAnimation animation, LineHitChecker hitChecker, LineDestroyer lineDestroyer, Line ownLine = null)
     {
         _animation = animation;
         _hitChecker = hitChecker;
         _lineDestroyer = lineDestroyer;
-        _isInitialized = true;
-
-        if (_ownLine == null)
+        
+        if (ownLine != null)
         {
-            _ownLine = GetComponent<Line>();
+            _ownLine = ownLine;
         }
 
+        _isInitialized = true;
         SubscribeToEvents();
     }
 

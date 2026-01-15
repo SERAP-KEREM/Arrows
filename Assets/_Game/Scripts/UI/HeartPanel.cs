@@ -10,22 +10,17 @@ namespace _Game.UI
         [SerializeField] private List<HeartUI> _hearts = new List<HeartUI>();
 
         private const int MaxHearts = 5;
+        private bool _isInitialized = false;
 
-        private void Awake()
+        public void Initialize()
         {
-            if (_hearts.Count == 0)
-            {
-                _hearts.AddRange(GetComponentsInChildren<HeartUI>(true));
-            }
+            if (_isInitialized) return;
 
             if (_hearts.Count != MaxHearts)
             {
                 Debug.LogWarning($"{name}: Expected {MaxHearts} hearts, but found {_hearts.Count}. Please assign {MaxHearts} HeartUI components in Inspector.", this);
             }
-        }
 
-        public void Initialize()
-        {
             foreach (var heart in _hearts)
             {
                 if (heart != null)
@@ -33,6 +28,8 @@ namespace _Game.UI
                     heart.Initialize();
                 }
             }
+
+            _isInitialized = true;
         }
 
         public void UpdateHearts(int activeLives)

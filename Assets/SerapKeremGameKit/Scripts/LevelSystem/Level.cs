@@ -2,6 +2,7 @@ using SerapKeremGameKit._Camera;
 using SerapKeremGameKit._InputSystem;
 using SerapKeremGameKit._Logging;
 using SerapKeremGameKit._Managers;
+using SerapKeremGameKit._UI;
 using System.Collections;
 using TriInspector;
 using UnityEngine;
@@ -109,13 +110,24 @@ namespace SerapKeremGameKit._LevelSystem
                 RegisterAllLines();
                 _lineManager.OnAllLinesRemoved += HandleAllLinesRemoved;
             }
+
+            InitializeHUD();
+        }
+
+        private void InitializeHUD()
+        {
+            UIRootController uiRoot = FindFirstObjectByType<UIRootController>();
+            if (uiRoot != null)
+            {
+                uiRoot.InitializeHUD();
+            }
         }
 
         private void SubscribeToLivesManager()
         {
             if (LivesManager.IsInitialized && LivesManager.Instance != null)
             {
-                LivesManager.Instance.ResetLives();
+                LivesManager.Instance.Initialize();
                 LivesManager.Instance.OnLivesDepleted += HandleLivesDepleted;
                 
                 if (LivesManager.Instance.CurrentLives <= 0)
@@ -138,7 +150,7 @@ namespace SerapKeremGameKit._LevelSystem
             {
                 if (LivesManager.IsInitialized && LivesManager.Instance != null)
                 {
-                    LivesManager.Instance.ResetLives();
+                    LivesManager.Instance.Initialize();
                     LivesManager.Instance.OnLivesDepleted += HandleLivesDepleted;
                     
                     if (LivesManager.Instance.CurrentLives <= 0)

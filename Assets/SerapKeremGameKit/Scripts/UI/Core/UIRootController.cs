@@ -68,6 +68,11 @@ namespace SerapKeremGameKit._UI
         private void ApplyInitialState()
         {
             HideAll();
+            InitializeHUD();
+        }
+
+        public void InitializeHUD()
+        {
             if (_hud != null)
             {
                 _hud.Show(false);

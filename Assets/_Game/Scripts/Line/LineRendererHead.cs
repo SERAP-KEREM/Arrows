@@ -22,6 +22,8 @@ namespace _Game.Line
         EnsureActive();
         SetupPhysicsComponents();
         SetupCollisionDetector();
+        
+        enabled = lineRenderer != null;
     }
 
     private void EnsureActive()
@@ -68,17 +70,10 @@ namespace _Game.Line
     
     private void Awake()
     {
-        EnsureActive();
-    }
-
-    private void OnEnable()
-    {
-        EnsureActive();
-    }
-
-    private void Start()
-    {
-        EnsureActive();
+        if (lineRenderer == null)
+        {
+            enabled = false;
+        }
     }
     
     private void HandleHeadCollision(Collider2D other)
@@ -93,29 +88,10 @@ namespace _Game.Line
             _collisionDetector.OnHeadCollision -= HandleHeadCollision;
         }
     }
-    
-    private void OnDisable()
-    {
-    }
 
     private void LateUpdate()
     {
-        if (!gameObject.activeSelf)
-        {
-            gameObject.SetActive(true);
-        }
-        
-        if (this == null || gameObject == null)
-        {
-            return;
-        }
-
-        if (!lineRenderer)
-        {
-            return;
-        }
-
-        if (lineRenderer.positionCount < 2)
+        if (lineRenderer == null || lineRenderer.positionCount < 2)
         {
             return;
         }

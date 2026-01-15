@@ -15,6 +15,7 @@ namespace _Game.Line
     [SerializeField] private LineDestroyer _destroyer;
     [SerializeField] private LineSegmentColliderSpawner2D _colliderSpawner;
     [SerializeField] private LineRendererHead _lineHead;
+    [SerializeField] private SpriteRenderer _lineHeadSpriteRenderer;
     [SerializeField] private LineMaterialHandler _materialHandler;
 
     public LineRenderer LineRenderer => _lineRenderer;
@@ -24,6 +25,7 @@ namespace _Game.Line
     public bool IsClickable => !_hasCollided && (_animation == null || !_animation.IsPlaying || (_animation.IsPlaying && _animation.IsForward));
 
     private LineManager _lineManager;
+    private Vector3ArrayPool _arrayPool;
     private bool _hasCollided = false;
     private bool _hasLostLifeForThisCollision = false;
 
@@ -50,6 +52,7 @@ namespace _Game.Line
         }
 
         _lineManager = lineManager;
+        _arrayPool = _lineManager != null ? _lineManager.Vector3ArrayPool : null;
 
         ValidateComponents();
 
@@ -80,16 +83,6 @@ namespace _Game.Line
 
     private void InitializeMaterialHandler()
     {
-        if (_materialHandler == null)
-        {
-            _materialHandler = GetComponent<LineMaterialHandler>();
-        }
-
-        if (_materialHandler == null)
-        {
-            _materialHandler = gameObject.AddComponent<LineMaterialHandler>();
-        }
-
         if (_materialHandler != null && _lineRenderer != null)
         {
             _materialHandler.AddRenderer(_lineRenderer);
@@ -98,30 +91,21 @@ namespace _Game.Line
 
     private void AddHeadToMaterialHandler()
     {
-        if (_materialHandler == null || _lineHead == null) return;
+        if (_materialHandler == null || _lineHeadSpriteRenderer == null) return;
 
-        SpriteRenderer headSprite = _lineHead.GetComponent<SpriteRenderer>();
-        if (headSprite == null)
-        {
-            headSprite = _lineHead.GetComponentInChildren<SpriteRenderer>(true);
-        }
-
-        if (headSprite != null)
-        {
-            _materialHandler.AddRenderer(headSprite);
-        }
+        _materialHandler.AddRenderer(_lineHeadSpriteRenderer);
     }
 
     private void InjectDependencies()
     {
         if (_animation != null)
         {
-            _animation.Initialize(_lineRenderer);
+            _animation.Initialize(_lineRenderer, _arrayPool);
         }
 
         if (_click != null)
         {
-            _click.Initialize(_animation, _hitChecker, _destroyer);
+            _click.Initialize(_animation, _hitChecker, _destroyer, this);
         }
 
         if (_colliderSpawner != null)
@@ -134,16 +118,6 @@ namespace _Game.Line
 
     private void InitializeLineHead()
     {
-        if (_lineHead == null)
-        {
-            _lineHead = GetComponentInChildren<LineRendererHead>(true);
-        }
-        
-        if (_lineHead == null)
-        {
-            _lineHead = CreateLineHead();
-        }
-
         if (_lineHead != null && _lineHead.gameObject != null)
         {
             _lineHead.gameObject.SetActive(true);
@@ -152,15 +126,6 @@ namespace _Game.Line
             _hasCollided = false;
             _hasLostLifeForThisCollision = false;
         }
-    }
-
-    private LineRendererHead CreateLineHead()
-    {
-        GameObject headObj = new GameObject("Head");
-        headObj.transform.SetParent(transform);
-        headObj.transform.localPosition = Vector3.zero;
-        headObj.SetActive(true);
-        return headObj.AddComponent<LineRendererHead>();
     }
 
     private void SubscribeToEvents()

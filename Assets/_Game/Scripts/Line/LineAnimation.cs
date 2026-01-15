@@ -16,7 +16,7 @@ namespace _Game.Line
     private bool _isInitialized;
     private bool _wasPlaying;
     private Vector3[] _tempPositionsArray;
-    private static Vector3ArrayPool _arrayPool;
+    private Vector3ArrayPool _arrayPool;
 
     public bool IsPlaying => _isPlaying;
     public bool IsForward => _forward;
@@ -27,7 +27,7 @@ namespace _Game.Line
     public event Action OnAnimationCompleted;
     public event Action OnLinePositionsChanged;
 
-    public void Initialize(LineRenderer lineRenderer)
+    public void Initialize(LineRenderer lineRenderer, Vector3ArrayPool arrayPool = null)
     {
         if (lineRenderer == null) return;
 
@@ -45,17 +45,10 @@ namespace _Game.Line
         var lastPoint = line.GetPosition(count - 1);
         _direction = lastPoint - line.GetPosition(count - 2);
         
-        if (_arrayPool == null)
-        {
-            _arrayPool = FindFirstObjectByType<Vector3ArrayPool>();
-            if (_arrayPool == null)
-            {
-                GameObject poolObj = new GameObject(nameof(Vector3ArrayPool));
-                _arrayPool = poolObj.AddComponent<Vector3ArrayPool>();
-            }
-        }
+        _arrayPool = arrayPool;
         
         _isInitialized = true;
+        enabled = false;
     }
 
     public void Play(bool forwardDirection)
@@ -66,6 +59,7 @@ namespace _Game.Line
         bool wasPlaying = _isPlaying;
         _forward = forwardDirection;
         _isPlaying = true;
+        enabled = true;
 
         if (!wasPlaying)
         {
@@ -79,6 +73,7 @@ namespace _Game.Line
         if (_isPlaying)
         {
             _isPlaying = false;
+            enabled = false;
             OnAnimationStopped?.Invoke();
         }
         
@@ -100,25 +95,11 @@ namespace _Game.Line
 
     private void Update()
     {
-        bool wasPlaying = _wasPlaying;
-        _wasPlaying = _isPlaying;
-
-        if (!_isPlaying)
-        {
-            if (wasPlaying)
-            {
-                OnAnimationStopped?.Invoke();
-            }
-            return;
-        }
-
         if (!line || line.positionCount < 2)
         {
             _isPlaying = false;
-            if (wasPlaying)
-            {
-                OnAnimationStopped?.Invoke();
-            }
+            enabled = false;
+            OnAnimationStopped?.Invoke();
             return;
         }
 
@@ -174,6 +155,7 @@ namespace _Game.Line
         if (newCount < 2)
         {
             _isPlaying = false;
+            enabled = false;
             OnAnimationCompleted?.Invoke();
         }
     }
@@ -232,6 +214,7 @@ namespace _Game.Line
         {
             line.SetPositions(positionsOrigin);
             _isPlaying = false;
+            enabled = false;
             OnLinePositionsChanged?.Invoke();
             OnAnimationCompleted?.Invoke();
             return;

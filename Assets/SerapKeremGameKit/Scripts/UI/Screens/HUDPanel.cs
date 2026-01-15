@@ -14,28 +14,31 @@ namespace SerapKeremGameKit._UI
         [SerializeField] private UIRootController _uiRoot;
         [SerializeField] private HeartPanel _heartPanel;
 
+        private bool _isInitialized = false;
+
         private void Awake()
         {
             if (_restartButton != null) _restartButton.BindOnClick(this, OnRestartClicked);
             if (_settingsButton != null) _settingsButton.BindOnClick(this, OnSettingsClicked);
-            
-            if (_heartPanel == null)
-            {
-                _heartPanel = GetComponentInChildren<HeartPanel>(true);
-            }
-        }
-
-        private void Start()
-        {
-            SubscribeToLivesManager();
-            InitializeHeartPanel();
         }
 
         public override void Show(bool playSound = true)
         {
             base.Show(playSound);
+            
+            if (!_isInitialized)
+            {
+                Initialize();
+            }
+            
             SubscribeToLivesManager();
             InitializeHeartPanel();
+        }
+
+        private void Initialize()
+        {
+            if (_isInitialized) return;
+            _isInitialized = true;
         }
 
         protected override void OnDestroy()

@@ -12,10 +12,14 @@ namespace _Game.Line
     [SerializeField, ReadOnly] 
     private List<Line> _activeLines = new();
 
+    [Header("Pool Reference")]
+    [SerializeField] private Vector3ArrayPool _vector3ArrayPool;
+
     [ShowInInspector, ReadOnly]
     public int ActiveLineCount => _activeLines.Count;
 
     public IReadOnlyList<Line> ActiveLines => _activeLines;
+    public Vector3ArrayPool Vector3ArrayPool => _vector3ArrayPool;
 
     public event Action OnAllLinesRemoved;
 

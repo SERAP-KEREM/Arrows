@@ -20,6 +20,10 @@ namespace _Game.UI
         protected override void Awake()
         {
             base.Awake();
+        }
+
+        public void Initialize()
+        {
             ResetLives();
         }
 

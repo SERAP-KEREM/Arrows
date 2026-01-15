@@ -17,6 +17,8 @@ namespace _Game.Line
         {
             _lineRaycastGun2D = lineRaycastGun2D;
         }
+        enabled = false;
+        _active = false;
     }
 
     public void StartChecking()

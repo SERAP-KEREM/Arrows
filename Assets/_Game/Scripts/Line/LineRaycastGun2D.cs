@@ -23,9 +23,13 @@ namespace _Game.Line
         if (!head) head = transform;
     }
 
+    private void Awake()
+    {
+        enabled = shootEveryFrame;
+    }
+
     private void Update()
     {
-        if (!shootEveryFrame) return;
         Shoot();
     }
 
