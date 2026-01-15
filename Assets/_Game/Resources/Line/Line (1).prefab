@@ -100,10 +100,7 @@ GameObject:
   - component: {fileID: 2004340178550153643}
   - component: {fileID: 2889735952934244776}
   - component: {fileID: 579988495362921800}
-  - component: {fileID: 6068188263390121324}
   - component: {fileID: 4698239093576954667}
-  - component: {fileID: 5917618282005337659}
-  - component: {fileID: 2728101366424247942}
   - component: {fileID: 3898713965489042308}
   - component: {fileID: 8190878419885716933}
   m_Layer: 7
@@ -257,7 +254,6 @@ MonoBehaviour:
   _lineRenderer: {fileID: 5703179247697745139}
   _animation: {fileID: 2889735952934244776}
   _click: {fileID: 4698239093576954667}
-  _hitChecker: {fileID: 6068188263390121324}
   _destroyer: {fileID: 579988495362921800}
   _colliderSpawner: {fileID: 3898713965489042308}
   _lineHead: {fileID: 1227772318919715864}
@@ -289,19 +285,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   destroyDelay: 2
---- !u!114 &6068188263390121324
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4852218959071952598}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e093bc85e256984897722a47d981e3b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _lineRaycastGun2D: {fileID: 5917618282005337659}
 --- !u!114 &4698239093576954667
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -315,42 +298,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _ownLine: {fileID: 0}
---- !u!114 &5917618282005337659
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4852218959071952598}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53060e1461fcd754599c3659a81ee598, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  head: {fileID: 9200941245333506865}
-  rayLength: 5
-  offset: 0.5
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 128
-  shootEveryFrame: 1
-  drawGizmos: 1
---- !u!114 &2728101366424247942
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4852218959071952598}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a67436211136dd4786c17f7238eeba5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lr: {fileID: 5703179247697745139}
-  snapSize: 1
-  snapInEditor: 1
-  snapAtRuntime: 0
 --- !u!114 &3898713965489042308
 MonoBehaviour:
   m_ObjectHideFlags: 0
