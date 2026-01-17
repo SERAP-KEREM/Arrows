@@ -16,6 +16,7 @@ namespace _Game.Line
     [SerializeField] private LineRendererHead _lineHead;
     [SerializeField] private SpriteRenderer _lineHeadSpriteRenderer;
     [SerializeField] private LineMaterialHandler _materialHandler;
+    [SerializeField] private LineRendererSnapFixer _snapFixer;
 
     public LineRenderer LineRenderer => _lineRenderer;
     public LineAnimation Animation => _animation;
@@ -69,6 +70,7 @@ namespace _Game.Line
         }
         
         InitializeMaterialHandler();
+        InitializeSnapFixer();
         InjectDependencies();
         SubscribeToEvents();
         AddHeadToMaterialHandler();
@@ -94,6 +96,14 @@ namespace _Game.Line
         if (_materialHandler == null || _lineHeadSpriteRenderer == null) return;
 
         _materialHandler.AddRenderer(_lineHeadSpriteRenderer);
+    }
+
+    private void InitializeSnapFixer()
+    {
+        if (_snapFixer != null)
+        {
+            _snapFixer.Initialize();
+        }
     }
 
     private void InjectDependencies()
