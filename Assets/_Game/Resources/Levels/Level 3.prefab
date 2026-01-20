@@ -61,6 +61,7 @@ MonoBehaviour:
   _isLevelWon: 0
   _money: 10
   _lineManager: {fileID: 8253618541472653865}
+  _linesParent: {fileID: 4611233104208101624}
 --- !u!1 &2837266096709259451
 GameObject:
   m_ObjectHideFlags: 0

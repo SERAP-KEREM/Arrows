@@ -1471,6 +1471,10 @@ PrefabInstance:
       propertyPath: m_BackGroundColor.r
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5768790214394524418, guid: 6ada64ac7a7514849b368d274d552132, type: 3}
+      propertyPath: _padding
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

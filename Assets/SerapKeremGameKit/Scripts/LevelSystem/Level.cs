@@ -37,6 +37,8 @@ namespace SerapKeremGameKit._LevelSystem
 
         [SerializeField] private LineManager _lineManager;
         public LineManager LineManager { get => _lineManager; set => _lineManager = value; }
+
+        [SerializeField] private Transform _linesParent;
         public virtual void Load()
         {
             gameObject.SetActive(true);
@@ -73,6 +75,14 @@ namespace SerapKeremGameKit._LevelSystem
                 TraceLogger.LogError("CameraManager.Instance is null! Cannot initialize camera position.", this);
                 return;
             }
+
+            if (_linesParent == null)
+            {
+                TraceLogger.LogWarning("Lines parent is not assigned in Inspector. Camera will not be fitted to lines.", this);
+                return;
+            }
+
+            CameraManager.Instance.FitCameraToLines(_linesParent);
         }
 
         public virtual void Play()
