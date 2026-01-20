@@ -253,6 +253,7 @@ MonoBehaviour:
   _lineHeadSpriteRenderer: {fileID: 4594035126425610268}
   _materialHandler: {fileID: 8190878419885716933}
   _snapFixer: {fileID: 1088355798733759430}
+  _collisionSoundKey: collision_sound_key
 --- !u!114 &2889735952934244776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -266,6 +267,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 20
+  _movementSoundKey: movement_sound_key
 --- !u!114 &579988495362921800
 MonoBehaviour:
   m_ObjectHideFlags: 0

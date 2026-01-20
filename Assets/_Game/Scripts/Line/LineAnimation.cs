@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using SerapKeremGameKit._Audio;
+using SerapKeremGameKit._Haptics;
 
 namespace _Game.Line
 {
@@ -7,6 +9,7 @@ namespace _Game.Line
 {
     private LineRenderer line;
     [SerializeField] private float speed = 5f;
+    [SerializeField] private string _movementSoundKey = "";
 
     private bool _isPlaying;
     private bool _forward;
@@ -62,6 +65,11 @@ namespace _Game.Line
         if (!wasPlaying)
         {
             OnAnimationStarted?.Invoke(forwardDirection);
+            
+            if (AudioManager.IsInitialized && !string.IsNullOrEmpty(_movementSoundKey)) 
+                AudioManager.Instance.Play(_movementSoundKey);
+            if (HapticManager.IsInitialized) 
+                HapticManager.Instance.Play(HapticType.Selection);
         }
     }
 

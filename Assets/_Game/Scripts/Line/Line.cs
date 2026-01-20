@@ -1,5 +1,7 @@
 using UnityEngine;
 using SerapKeremGameKit._Logging;
+using SerapKeremGameKit._Audio;
+using SerapKeremGameKit._Haptics;
 using _Game.UI;
 
 namespace _Game.Line
@@ -17,6 +19,9 @@ namespace _Game.Line
     [SerializeField] private SpriteRenderer _lineHeadSpriteRenderer;
     [SerializeField] private LineMaterialHandler _materialHandler;
     [SerializeField] private LineRendererSnapFixer _snapFixer;
+    
+    [Header("Audio Settings")]
+    [SerializeField] private string _collisionSoundKey = "";
 
     public LineRenderer LineRenderer => _lineRenderer;
     public LineAnimation Animation => _animation;
@@ -228,6 +233,11 @@ namespace _Game.Line
     {
         if (_hasCollided) return;
         _hasCollided = true;
+
+        if (AudioManager.IsInitialized && !string.IsNullOrEmpty(_collisionSoundKey)) 
+            AudioManager.Instance.Play(_collisionSoundKey);
+        if (HapticManager.IsInitialized) 
+            HapticManager.Instance.Play(HapticType.Selection);
 
         if (_animation != null)
         {
