@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using _Game.UI;
 
 namespace SerapKeremGameKit._UI
 {
@@ -11,6 +12,9 @@ namespace SerapKeremGameKit._UI
         [SerializeField] private Button _restartButton;
         [SerializeField] private Button _settingsButton;
         [SerializeField] private UIRootController _uiRoot;
+        [SerializeField] private HeartPanel _heartPanel;
+
+        private bool _isInitialized = false;
 
         private void Awake()
         {
@@ -18,10 +22,66 @@ namespace SerapKeremGameKit._UI
             if (_settingsButton != null) _settingsButton.BindOnClick(this, OnSettingsClicked);
         }
 
+        public override void Show(bool playSound = true)
+        {
+            base.Show(playSound);
+            
+            if (!_isInitialized)
+            {
+                Initialize();
+            }
+            
+            SubscribeToLivesManager();
+            InitializeHeartPanel();
+        }
+
+        private void Initialize()
+        {
+            if (_isInitialized) return;
+            _isInitialized = true;
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
+            UnsubscribeFromLivesManager();
             // Auto-unsubscribe handled by ButtonExtensions
+        }
+
+        private void SubscribeToLivesManager()
+        {
+            if (_uiRoot != null && _uiRoot.LivesManagerInstance != null)
+            {
+                _uiRoot.LivesManagerInstance.OnLivesChanged += HandleLivesChanged;
+            }
+        }
+
+        private void UnsubscribeFromLivesManager()
+        {
+            if (_uiRoot != null && _uiRoot.LivesManagerInstance != null)
+            {
+                _uiRoot.LivesManagerInstance.OnLivesChanged -= HandleLivesChanged;
+            }
+        }
+
+        private void InitializeHeartPanel()
+        {
+            if (_heartPanel != null)
+            {
+                _heartPanel.Initialize();
+                if (_uiRoot != null && _uiRoot.LivesManagerInstance != null)
+                {
+                    _heartPanel.UpdateHearts(_uiRoot.LivesManagerInstance.CurrentLives);
+                }
+            }
+        }
+
+        private void HandleLivesChanged(int currentLives)
+        {
+            if (_heartPanel != null)
+            {
+                _heartPanel.UpdateHearts(currentLives);
+            }
         }
 
         public void SetLevelIndex(int levelIndex)

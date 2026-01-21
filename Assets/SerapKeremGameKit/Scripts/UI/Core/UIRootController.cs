@@ -6,6 +6,7 @@ using SerapKeremGameKit._Time;
 using UnityEngine;
 using SerapKeremGameKit._Audio;
 using SerapKeremGameKit._Haptics;
+using _Game.UI;
 
 namespace SerapKeremGameKit._UI
 {
@@ -67,6 +68,11 @@ namespace SerapKeremGameKit._UI
         private void ApplyInitialState()
         {
             HideAll();
+            InitializeHUD();
+        }
+
+        public void InitializeHUD()
+        {
             if (_hud != null)
             {
                 _hud.Show(false);
@@ -120,9 +126,7 @@ namespace SerapKeremGameKit._UI
                 Level active = LevelManager.Instance.ActiveLevelInstance;
                 LevelConfig config = ResolveConfig(active);
 
-                // Calculate completion time: levelTime - remainingTime
-                float completionTime = CalculateCompletionTime(active);
-                int stars = StarEvaluator.EvaluateStars(config, completionTime);
+                int stars = StarEvaluator.EvaluateStarsByLives();
                 int reward = Mathf.Max(0, config != null ? config.WinCoins : 10);
                 int totalBefore = 0;
                 if (CurrencyWallet.Instance != null)
@@ -251,6 +255,18 @@ namespace SerapKeremGameKit._UI
             if (_hud != null)
             {
                 _hud.UpdateTimeDisplay(remainingTime);
+            }
+        }
+
+        public LivesManager LivesManagerInstance
+        {
+            get
+            {
+                if (LivesManager.IsInitialized)
+                {
+                    return LivesManager.Instance;
+                }
+                return null;
             }
         }
     }

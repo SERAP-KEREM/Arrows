@@ -2,10 +2,13 @@ using SerapKeremGameKit._Camera;
 using SerapKeremGameKit._InputSystem;
 using SerapKeremGameKit._Logging;
 using SerapKeremGameKit._Managers;
+using SerapKeremGameKit._UI;
 using System.Collections;
 using TriInspector;
 using UnityEngine;
 using Array2DEditor;
+using _Game.Line;
+using _Game.UI;
 
 
 
@@ -14,10 +17,8 @@ namespace SerapKeremGameKit._LevelSystem
     public class Level : MonoBehaviour
     {
 
-        // [Title("Coins Settings")] // coin settings can be added here if level-specific
-
-		[Title("Grid Settings"), PropertyOrder(2)]
-		[SerializeField] private Array2DInt _tileSizeArray;
+        [Title("Grid Settings"), PropertyOrder(2)]
+        [SerializeField] private Array2DInt _tileSizeArray;
 
         [Title("Time Settings")]
         [SerializeField, Min(0f)] private float _levelTime = 120f;
@@ -30,72 +31,157 @@ namespace SerapKeremGameKit._LevelSystem
         [SerializeField] private long _money = 10;
         public long Money => _money;
 
+
         private Coroutine _winCoroutine;
         private Coroutine _loseCoroutine;
 
-        // [SerializeField] private Transform _levelCameraPoint;
+        [SerializeField] private LineManager _lineManager;
+        public LineManager LineManager { get => _lineManager; set => _lineManager = value; }
 
-        // [SerializeField] private float _currentLevelSize = 0f;
+        [SerializeField] private Transform _linesParent;
         public virtual void Load()
         {
             gameObject.SetActive(true);
-            // reset flags and stop any running routines
             _isLevelWon = false;
             if (_winCoroutine != null) { StopCoroutine(_winCoroutine); _winCoroutine = null; }
             if (_loseCoroutine != null) { StopCoroutine(_loseCoroutine); _loseCoroutine = null; }
+            
+            UnsubscribeFromEvents();
             Initialize();
-        
         }
+
         private void Initialize()
         {
-            StartCoroutine(InitializeCoroutine());
-
-        }
-        private IEnumerator InitializeCoroutine()
-        {
-            yield return new WaitForSeconds(0.1f);
             InitializeCamera();
+            InitializeLines();
+        }
+
+        private void InitializeLines()
+        {
+            if (_lineManager != null)
+            {
+                _lineManager.InitializeLines(transform);
+            }
+            else
+            {
+                TraceLogger.LogWarning("LineManager is not initialized. Lines will not be initialized.", this);
+            }
         }
 
         private void InitializeCamera()
         {
             if (CameraManager.Instance == null)
             {
-                TraceLogger.LogError("CameraManager.Instance is null! Cannot initialize camera position.");
+                TraceLogger.LogError("CameraManager.Instance is null! Cannot initialize camera position.", this);
                 return;
             }
 
-            //InitializeCameraPosition 
-            //if (_levelCameraCampoint != null)
-            //{
-            //    CameraManager.Instance.InitializeCameraPosition(_levelCameraCampoint);
-            //    RichLogger.Log($"Level Loaded: Camera positioned to {_levelCameraCampoint.name} in {gameObject.name}");
-            //}
-            //else
-            //{
-            //    RichLogger.LogWarning($"Level Load Warning: '_levelCameraCampoint' is not assigned for {gameObject.name}. Camera position might be incorrect.");
-            //}
+            if (_linesParent == null)
+            {
+                TraceLogger.LogWarning("Lines parent is not assigned in Inspector. Camera will not be fitted to lines.", this);
+                return;
+            }
 
-            //AdjustCameraByLevelSize
-            //if (_currentLevelSize != 0)
-            //{
-            //    CameraManager.Instance.AdjustCameraByLevelSize(_currentLevelSize); 
-            //    RichLogger.Log($"Level Loaded: Camera adjusted by level size: {_currentLevelSize} in {gameObject.name}");
-            //}
-            //else
-            //{
-            //    Debug.LogError("Level Load Error: CameraManager instance is not found! Ensure it's present and initialized.");
-            //}
+            CameraManager.Instance.FitCameraToLines(_linesParent);
         }
 
         public virtual void Play()
         {
             if (InputHandler.Instance != null)
             {
-                // unlock only if previously locked (defensive)
                 InputHandler.Instance.UnlockInput();
             }
 
+            _isLevelWon = false;
+            
+            if (_winCoroutine != null) 
+            { 
+                StopCoroutine(_winCoroutine); 
+                _winCoroutine = null; 
+            }
+            
+            if (_loseCoroutine != null) 
+            { 
+                StopCoroutine(_loseCoroutine); 
+                _loseCoroutine = null; 
+            }
+
+            UnsubscribeFromEvents();
+
+            SubscribeToLivesManager();
+
+            if (_lineManager != null)
+            {
+                _lineManager.OnAllLinesRemoved += HandleAllLinesRemoved;
+            }
+
+            InitializeHUD();
+        }
+
+        private void InitializeHUD()
+        {
+            UIRootController uiRoot = FindFirstObjectByType<UIRootController>();
+            if (uiRoot != null)
+            {
+                uiRoot.InitializeHUD();
+            }
+        }
+
+        private void SubscribeToLivesManager()
+        {
+            if (LivesManager.IsInitialized && LivesManager.Instance != null)
+            {
+                LivesManager.Instance.Initialize();
+                LivesManager.Instance.OnLivesDepleted += HandleLivesDepleted;
+                
+                if (LivesManager.Instance.CurrentLives <= 0)
+                {
+                    HandleLivesDepleted();
+                }
+            }
+            else
+            {
+                StartCoroutine(SubscribeToLivesManagerCoroutine());
+            }
+        }
+
+        private IEnumerator SubscribeToLivesManagerCoroutine()
+        {
+            int maxAttempts = 10;
+            int attempts = 0;
+            
+            while (attempts < maxAttempts)
+            {
+                if (LivesManager.IsInitialized && LivesManager.Instance != null)
+                {
+                    LivesManager.Instance.Initialize();
+                    LivesManager.Instance.OnLivesDepleted += HandleLivesDepleted;
+                    
+                    if (LivesManager.Instance.CurrentLives <= 0)
+                    {
+                        HandleLivesDepleted();
+                    }
+                    
+                    yield break;
+                }
+                
+                yield return null;
+                attempts++;
+            }
+
+            TraceLogger.LogWarning("LivesManager is not initialized after multiple attempts. Fail condition may not work.", this);
+        }
+
+
+        private void HandleLivesDepleted()
+        {
+            if (_loseCoroutine != null) return;
+            CheckLoseCondition();
+        }
+
+        private void HandleAllLinesRemoved()
+        {
+            CheckWinCondition();
         }
 
         public void CheckWinCondition()
@@ -108,10 +194,8 @@ namespace SerapKeremGameKit._LevelSystem
 
         private IEnumerator WinCoroutine()
         {
-			if (InputHandler.Instance != null) InputHandler.Instance.LockInput();
+            if (InputHandler.Instance != null) InputHandler.Instance.LockInput();
             yield return new WaitForSeconds(0.5f);
-            // Example: reward coins for win
-            // int coins = PlayerPrefs.GetInt("skgk.currency.coins", 0) + 10; PlayerPrefs.SetInt("skgk.currency.coins", coins); PlayerPrefs.Save();
             LevelManager.Instance.Win();
         }
 
@@ -124,13 +208,28 @@ namespace SerapKeremGameKit._LevelSystem
 
         private IEnumerator LoseCoroutine()
         {
-			if (InputHandler.Instance != null) InputHandler.Instance.LockInput();
+            if (InputHandler.Instance != null) InputHandler.Instance.LockInput();
             yield return new WaitForSeconds(0.5f);
-
-            TraceLogger.Log("LOSE!!!");
 
             LevelManager.Instance.Lose();
         }
 
+        private void UnsubscribeFromEvents()
+        {
+            if (LivesManager.IsInitialized && LivesManager.Instance != null)
+            {
+                LivesManager.Instance.OnLivesDepleted -= HandleLivesDepleted;
+            }
+
+            if (_lineManager != null)
+            {
+                _lineManager.OnAllLinesRemoved -= HandleAllLinesRemoved;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            UnsubscribeFromEvents();
+        }
     }
 }
