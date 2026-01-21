@@ -1,199 +1,229 @@
-# SerapKeremGameKit — Unity Game Boilerplate
+# 🎯➡️ Arrows
 
-_A lightweight yet powerful Unity game boilerplate (template) for rapid prototyping and scalable production._
+**Arrows** is a challenging line-based puzzle game where players strategically activate animated lines to clear the playfield. Avoid collisions, manage your lives, and complete all levels.
+Developed with **Unity**, the game features smooth animations, intelligent collision detection, and a robust, scalable architecture.
 
-A production‑ready Unity boilerplate/template to kickstart new games fast. It ships with a clean, decoupled architecture, ready‑to‑use managers, pooled audio/particles, UI helpers, haptics, input handling, and editor tooling. Designed for readability, modularity, and scalability. This separation keeps your game logic independent from engine lifecycle, enabling faster iteration and easier testing.
+---
 
-- **Engine**: Unity (URP supported)
-- **Language**: C#
+## 🎮 About the Game
+
+Arrows is a line-based puzzle game where players activate lines by clicking on them.
+Each line moves forward with an animation while gradually disappearing from its tail.
+
+The core challenge lies in **timing your clicks correctly** to prevent collisions between lines.
+
+* When two lines collide, you lose a life.
+* Clear all lines to win the level.
+
+---
+
+## 🎥 Gameplay Video
+
+[https://github.com/user-attachments/assets/d94b12ce-ee31-4cbf-88be-0a3252be2a14](https://github.com/user-attachments/assets/d94b12ce-ee31-4cbf-88be-0a3252be2a14)
+
+---
+
+## 🖼️ Screenshots
+
+<p align="center">
+
+  <img src="https://github.com/SERAP-KEREM/Arrows/blob/main/Assets/GameImages/1.png?raw=true" alt="Game Screenshot 1" width="300">
+
+  <img src="https://github.com/SERAP-KEREM/Arrows/blob/main/Assets/GameImages/2.png?raw=true" alt="Game Screenshot 2" width="300">
+
+</p>
+
+<p align="center">
+
+  <img src="https://github.com/SERAP-KEREM/Arrows/blob/main/Assets/GameImages/3.png?raw=true" alt="Game Screenshot 3" width="300">
+
+  <img src="https://github.com/SERAP-KEREM/Arrows/blob/main/Assets/GameImages/4.png?raw=true" alt="Game Screenshot 4" width="300">
+
+</p>
+
+---
+
+## ✨ Game Features
+
+### 🎯 Core Mechanics
+
+* ➡️ **Interactive Line System**
+  Activate precise, smooth forward animations by clicking on lines.
+* 💥 **Smart Collision Detection**
+  Advanced head-to-line collision system.
+* ❤️ **Lives Management**
+  Start with 5 lives and track remaining lives via heart-based UI.
+* 🏆 **Win / Lose Conditions**
+  Clear all lines to win; lose all lives to fail the level.
+* 📊 **Level Progression**
+  10 carefully designed levels with increasing difficulty.
+
+---
+
+### 🎨 Visual Features
+
+* 🎬 **Smooth Animations**
+  DOTween-powered forward and backward line animations.
+* 🎨 **Dynamic Color Feedback**
+  Lines change color on collision to clearly indicate errors.
+* 📹 **Automatic Camera Adjustment**
+  Camera automatically frames all lines per level.
+* ✨ **Line Head Tracking**
+  A visual “head” object follows the line tip for better visibility.
+* 🎞️ **Material System**
+  Dynamic material and color management for visual feedback.
+
+---
+
+## 🧠 Technical Features
+
+* 🧱 **Component-Based Architecture**
+  Modular, SOLID-compliant design with clear separation of responsibilities.
+* ⚡ **Vector3 Array Pooling**
+  Zero-allocation animation system optimized for performance.
+* 🔄 **State Management**
+  Centralized game state control via a `StateManager`.
+* 🔊 **Audio & Haptics**
+  Sound effects and tactile feedback support.
+* 📂 **Level System**
+  Flexible prefab-based level loading and flow control.
+* 🎛️ **Explicit Initialization**
+  Clear, deterministic initialization order instead of Unity’s implicit lifecycle.
 
 
-## Features
+---
 
-### Core Systems
-- 🎵 **Audio System** — Key‑based SFX/music, optional 3D, pooling, PlayerPrefs.
-- 💨 **Particle System** — Key‑based pooled particles with auto‑recycle.
-- 📱 **Haptics** — Cross‑platform feedback API with enable/disable and cooldown.
-- 🖥️ **UI Core** — Animated `UIPanel` base (DOTween fades), audio/haptic hooks.
-- 🧠 **Input Handler** — Centralized input with lock/unlock and `PlayerInputSO`.
+## 🛠️ Tools & Packages Used
 
-### Utilities & Architecture
-- 💰 **Economy** — Secure `CurrencyWallet` (PlayerPrefs + signature) to deter tampering.
-- ⚙️ **Managers** — Lightweight, safe `MonoSingleton<T>` pattern with guards.
-- 🪶 **Utilities** — Colored logger, save debounce, preference keys.
-- 🧩 **UI Utilities** — `Button.BindOnClick(owner, action)` with auto‑unbind.
-- 🧰 **Prefabs** — Ready‑to‑drop manager/UI prefabs under `Resources/*`.
+### 📦 Unity Packages
 
-> 🎬 Run the sample scene to see audio, haptics, and UI fades in action.
+- ⚙️ **Unity Engine** — 6000.0.58f2 (Unity 6)
+- 🔄 **DOTween** — Tween-based animations for line movement  
+- 🧰 **TriInspector** — Advanced Inspector UI for efficient development  
+- 🎨 **Universal Render Pipeline (URP)** — Modern and optimized rendering  
+- 📝 **TextMeshPro** — Advanced text rendering for UI  
+- ➰ **Line Renderer** — Core system for rendering and animating dynamic lines
 
+---
 
-## Getting Started
+### 🧩 Custom Framework
 
-### 1) Use as Template (Recommended)
-- Click “Use this template” on GitHub to generate your own repository.
-- Or fork and rename your project repo.
-- Suggested repo topics for discoverability: `unity`, `boilerplate`, `unity-template`, `game-template`, `unity-urp`.
+**SerapKeremGameKit** – Production-ready Unity infrastructure:
 
-### Alternative: Clone/Import
-- Clone the repo into your Unity project `Assets` or import as a template.
-- Open with a Unity version compatible with URP.
+* 📝 Logging and tracing system
+* 🔊 Pooling-based audio management
+* 📳 Cross-platform haptic support
+* ✨ Auto-recycling particle system
+* ♻️ State-driven level system
+* 🖼️ Panel-based UI framework
+* 🔄 Game state management system
+* 💰 Currency / wallet system
+* 🧰 Guarded MonoSingleton architecture
 
-### 2) Open Sample
-- Open `Assets/_Game/Scenes/GameScene.unity` and press Play.
+---
 
-### 3) Prerequisite: Managers Setup
-- Keep provided prefabs in scene or instantiate at runtime:
-  - `Resources/Managers/AudioManager.prefab`
-  - `Resources/Managers/HapticManager.prefab`
-  - `Resources/Managers/ParticleManager.prefab`
-  - `Resources/Managers/GameManager.prefab`
-  - `Resources/Managers/LevelManager.prefab` (if used)
-  - `Resources/UI/UI.prefab` (root UI, if used)
+## 🎨 Custom Systems
 
+### ➡️ Line System
 
-## Folder Structure (key parts)
+A fully custom-built line architecture including:
+
+* 🎬 **LineAnimation**
+  Forward/backward animation using array pooling (zero allocation)
+* 👆 **LineClick**
+  Input handling and line activation logic
+* 💥 **LineHeadCollisionDetector**
+  Precise collision detection between line heads and bodies
+* 🎨 **LineMaterialHandler**
+  Dynamic color management for visual feedback
+* 🗑️ **LineDestroyer**
+  Automatic cleanup after animation completion
+* ➡️ **LineRendererHead**
+  Visual head object that follows the line’s endpoint
+
+---
+
+### 🎛️ Game Systems
+
+* ❤️ **LivesManager** — Singleton-based life management
+* 📹 **CameraManager** — Automatic camera adjustment based on level bounds
+* 🎯 **Level System** — Prefab-based loading with explicit initialization
+* 🔄 **StateManager** — Centralized game states (`Loading`, `OnStart`, `OnWin`, `OnLose`)
+
+---
+
+## 🎯 How to Play
+
+### 📘 Basic Rules
+
+* 🎯 **Click to Activate**
+  Click on any line to activate it.
+* ⏱️ **Timing Strategy**
+  Lines move at a constant speed — timing is critical.
+* 💥 **Avoid Collisions**
+  Each collision costs one life.
+* ➡️ **Line Completion**
+  Lines erase from the tail as they move and are removed after completion.
+* ❤️ **Manage Your Lives**
+  You start with 5 lives.
+* 🏆 **Win Condition**
+  Complete all lines without collisions.
+* 💔 **Lose Condition**
+  Lose all 5 lives.
+
+---
+
+### 🕹️ Controls
+
+* 🖱️ **Mouse / Touch** — Click or tap a line to activate
+* ⏸️ **No Re-activation** — Moving lines cannot be activated again
+* 🎯 **Strategy** — Analyze line placement carefully before clicking
+
+---
+
+## 📦 Project Structure
+
 ```
-Assets/SerapKeremGameKit/
-  Resources/
-    Managers/            # Drop‑in manager prefabs
-    UI/                  # Common UI prefabs (HUD, Settings, etc.)
-    Particle/            # Particle pool/player prefabs
-    Audio/               # Audio pool/player prefabs
-  Scripts/
-    Audio/               # AudioManager, AudioData, pooling
-    Particles/           # ParticleManager, data, pooling
-    Haptics/             # HapticManager, HapticType
-    UI/Core/             # UIPanel base (DOTween fades)
-    UI/Utilities/        # ButtonExtensions
-    InputSystem/         # InputHandler + PlayerInputSO
-    Economy/             # CurrencyWallet
-    LevelSystem/         # GameManager, State/Level managers
-    Utilities/           # TraceLogger, SaveUtility, PreferencesKeys
-    Singleton/           # MonoSingleton
-  Scenes/SampleScene.unity
+Assets/
+├── _Game/
+│   ├── Scripts/
+│   │   ├── Line/
+│   │   └── UI/
+│   ├── Resources/
+│   │   ├── Levels/
+│   │   └── Line/
+│   ├── Scenes/
+│   │   └── GameScene.unity
+│   └── ...
+└── SerapKeremGameKit/
 ```
 
+---
 
-## Usage Examples
+## 🚀 Getting Started
 
-### Audio
-Register clips on `AudioManager` via the inspector using `AudioData` entries with `Key` and `Clip`.
+### 📥 Installation
 
-```csharp
-// Play by key
-AudioManager.Instance.Play("ui_click");
-
-// Play 3D at position
-AudioManager.Instance.PlayAt("coin_tick", transform.position);
-
-// Music
-AudioManager.Instance.PlayMusic(backgroundClip);
-AudioManager.Instance.StopMusic();
-
-// User settings
-AudioManager.Instance.SetEnabled(true); // persists in PlayerPrefs
-bool enabled = AudioManager.Instance.IsEnabled();
+```bash
+git clone https://github.com/SERAP-KEREM/Arrows.git
 ```
 
-### Particles
-Create `ParticleData` list on `ParticleManager` and call by key.
+1. Open the project in **Unity Hub**
+2. Open the main scene:
+   `Assets/_Game/Scenes/GameScene.unity`
+3. Press **Play**
 
-```csharp
-ParticleManager.Instance.PlayParticle("coin_pop", transform.position);
-```
+---
 
-### Haptics
-Enable/disable and play with basic types.
+### 🛠️ Build
 
-```csharp
-HapticManager.Instance.SetEnabled(true);
-HapticManager.Instance.SetGlobalIntensity(0.8f);
-HapticManager.Instance.Play(HapticType.Light);
-```
+1. Go to **File → Build Settings**
+2. Select the target platform
+3. Click **Build**
 
-### UI Panels (DOTween fades + audio/haptics)
-`UIPanel` handles fade in/out and optional audio/haptics hooks.
+---
 
-```csharp
-public class SettingsPanel : UIPanel
-{
-    // Call Show()/Hide() to animate and play hooks
-}
-```
+## 📜 **License**
 
-### Button utility (auto‑unbind)
-
-```csharp
-public class MyUIButton : MonoBehaviour
-{
-    [SerializeField] private Button _button;
-
-    private void Awake()
-    {
-        _button.BindOnClick(this, OnClicked); // auto removes listener on destroy
-    }
-
-    private void OnClicked() { /* ... */ }
-}
-```
-
-### Input Handling
-Attach `InputHandler` and assign `PlayerInputSO`.
-
-```csharp
-if (InputHandler.IsInitialized)
-{
-    InputHandler.Instance.LockInput();
-    // ...
-    InputHandler.Instance.UnlockInput();
-}
-```
-
-### Wallet
-
-```csharp
-CurrencyWallet.Instance.Add(100);
-// PlayerPrefs + signature (tamper‑safe) storage
-bool ok = CurrencyWallet.Instance.TrySpend(50);
-int total = CurrencyWallet.Instance.Coins;
-```
-
-
-## Editor & Utilities
-- **TraceLogger**: Colored logs with caller info in Editor/Development builds.
-- **Toolbars**: Time scale/level toolbars under `Scripts/Editor` (if included).
-- **URP Setup**: `GameManager` reads current URP asset and applies shadow distance.
-
-## Using This Boilerplate
-- Click “Use this template” on GitHub to create a new repo from this boilerplate.
-- Replace company/game identifiers (namespace, product name) in `ProjectSettings` as needed.
-- Swap sample assets with your own; keep managers and core systems.
-- Add your own gameplay modules in `Scripts/` and hook into the provided managers.
-
-
-## Dependencies
-(All dependencies are optional but recommended for full feature set.)
-- TextMeshPro
-- TriInspector
-- Toolbar Extender
-- DOTween
-- Toony Colors Pro
-- Epic Toon FX
-- GUI Blue Sky
-- Unity URP (project SRP)
-
-If a package is missing, import it or remove related usages.
-
-
-## Roadmap
-- Addressables integration for audio/particles
-- Mobile haptic plugins (advanced patterns)
-- Sample gameplay loop and more UI screens
-
-
-## Contributing
-Pull requests welcome. Please follow the project code style: descriptive names, clear structure, and avoid deep nesting. Use consistent naming (PascalCase for classes, camelCase for fields) and avoid allocations in runtime loops. Prefer pooling for frequently spawned objects.
-
-
-## 📜 **License**  
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/SERAP-KEREM/SERAP-KEREM/blob/main/MIT%20License.txt) file for details.
+
