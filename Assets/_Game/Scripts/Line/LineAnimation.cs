@@ -6,174 +6,154 @@ using SerapKeremGameKit._Haptics;
 namespace _Game.Line
 {
     public class LineAnimation : MonoBehaviour
-{
-    private LineRenderer line;
-    [SerializeField] private float speed = 5f;
-    [SerializeField] private string _movementSoundKey = "";
-
-    private bool _isPlaying;
-    private bool _forward;
-    private Vector3 _direction;
-    private Vector3[] positionsOrigin;
-    private bool _isInitialized;
-    private Vector3[] _tempPositionsArray;
-    private Vector3ArrayPool _arrayPool;
-
-    public bool IsPlaying => _isPlaying;
-    public bool IsForward => _forward;
-    public Vector3 Direction => _direction;
-
-    public event Action<bool> OnAnimationStarted;
-    public event Action OnAnimationStopped;
-    public event Action OnAnimationCompleted;
-    public event Action OnLinePositionsChanged;
-
-    public void Initialize(LineRenderer lineRenderer, Vector3ArrayPool arrayPool = null)
     {
-        if (lineRenderer == null) return;
+        private LineRenderer line;
+        [SerializeField] private float speed = 5f;
+        [SerializeField] private string _movementSoundKey = "";
 
-        line = lineRenderer;
-        
-        var count = line.positionCount;
-        if (count < 2) return;
-        
-        positionsOrigin = new Vector3[count];
-        for (int i = 0; i < count; i++)
+        private bool _isPlaying;
+        private bool _forward;
+        private Vector3 _direction;
+        private Vector3[] positionsOrigin;
+        private bool _isInitialized;
+        private Vector3[] _tempPositionsArray;
+        private Vector3ArrayPool _arrayPool;
+        private float _visualZOffset;
+
+        public bool IsPlaying => _isPlaying;
+        public bool IsForward => _forward;
+        public Vector3 Direction => _direction;
+        public float VisualZOffset
         {
-            positionsOrigin[i] = line.GetPosition(i);
+            get => _visualZOffset;
+            set => _visualZOffset = value;
         }
 
-        var lastPoint = line.GetPosition(count - 1);
-        _direction = lastPoint - line.GetPosition(count - 2);
-        
-        _arrayPool = arrayPool;
-        
-        _isInitialized = true;
-        enabled = false;
-    }
+        public event Action<bool> OnAnimationStarted;
+        public event Action OnAnimationStopped;
+        public event Action OnAnimationCompleted;
+        public event Action OnLinePositionsChanged;
 
-    public void Play(bool forwardDirection)
-    {
-        if (!_isInitialized || line == null || line.positionCount < 2)
-            return;
-        
-        bool wasPlaying = _isPlaying;
-        _forward = forwardDirection;
-        _isPlaying = true;
-        enabled = true;
-
-        if (!wasPlaying)
+        public void Initialize(LineRenderer lineRenderer, Vector3ArrayPool arrayPool = null)
         {
-            OnAnimationStarted?.Invoke(forwardDirection);
-            
-            if (AudioManager.IsInitialized && !string.IsNullOrEmpty(_movementSoundKey)) 
-                AudioManager.Instance.Play(_movementSoundKey);
-            if (HapticManager.IsInitialized) 
-                HapticManager.Instance.Play(HapticType.Selection);
-        }
-    }
+            if (lineRenderer == null) return;
 
+            line = lineRenderer;
 
-    public void Stop()
-    {
-        if (_isPlaying)
-        {
-            _isPlaying = false;
+            var count = line.positionCount;
+            if (count < 2) return;
+
+            positionsOrigin = new Vector3[count];
+            for (int i = 0; i < count; i++)
+            {
+                positionsOrigin[i] = line.GetPosition(i);
+            }
+
+            var lastPoint = line.GetPosition(count - 1);
+            _direction = lastPoint - line.GetPosition(count - 2);
+
+            _arrayPool = arrayPool;
+
+            _isInitialized = true;
             enabled = false;
-            OnAnimationStopped?.Invoke();
-        }
-        
-        if (_tempPositionsArray != null && _arrayPool != null)
-        {
-            _arrayPool.RecycleArray(_tempPositionsArray);
-            _tempPositionsArray = null;
-        }
-    }
-    
-    private void OnDestroy()
-    {
-        if (_tempPositionsArray != null && _arrayPool != null)
-        {
-            _arrayPool.RecycleArray(_tempPositionsArray);
-            _tempPositionsArray = null;
-        }
-    }
-
-    private void Update()
-    {
-        if (!line || line.positionCount < 2)
-        {
-            _isPlaying = false;
-            enabled = false;
-            OnAnimationStopped?.Invoke();
-            return;
         }
 
-        if (_forward)
-            AnimateForward();
-        else
-            AnimateBackward();
-    }
-
-    private void AnimateForward()
-    {
-        var count = line.positionCount;
-        var lastPoint = line.GetPosition(count - 1);
-
-        lastPoint += _direction.normalized * (speed * Time.deltaTime);
-        line.SetPosition(count - 1, lastPoint);
-
-        var tailPoint = line.GetPosition(0);
-        var tailDirection = line.GetPosition(1) - tailPoint;
-        tailPoint += tailDirection.normalized * (speed * Time.deltaTime);
-        line.SetPosition(0, tailPoint);
-
-        OnLinePositionsChanged?.Invoke();
-
-        if (!(Vector3.Distance(tailPoint, line.GetPosition(1)) < 0.1f)) return;
-
-        var newCount = count - 1;
-        if (_arrayPool != null)
+        public void Play(bool forwardDirection)
         {
-            _tempPositionsArray = _arrayPool.GetArray(newCount);
-        }
-        else
-        {
-            _tempPositionsArray = new Vector3[newCount];
-        }
-        
-        for (int i = 1; i < count; i++)
-        {
-            _tempPositionsArray[i - 1] = line.GetPosition(i);
+            if (!_isInitialized || line == null || line.positionCount < 2)
+                return;
+
+            bool wasPlaying = _isPlaying;
+            _forward = forwardDirection;
+            _isPlaying = true;
+            enabled = true;
+
+            if (!wasPlaying)
+            {
+                OnAnimationStarted?.Invoke(forwardDirection);
+
+                if (AudioManager.IsInitialized && !string.IsNullOrEmpty(_movementSoundKey))
+                    AudioManager.Instance.Play(_movementSoundKey);
+                if (HapticManager.IsInitialized)
+                    HapticManager.Instance.Play(HapticType.Selection);
+            }
         }
 
-        line.positionCount = newCount;
-        line.SetPositions(_tempPositionsArray);
-        
-        if (_arrayPool != null)
+
+        public void Stop()
         {
-            _arrayPool.RecycleArray(_tempPositionsArray);
+            if (_isPlaying)
+            {
+                _isPlaying = false;
+                enabled = false;
+                OnAnimationStopped?.Invoke();
+            }
+
+            if (_tempPositionsArray != null && _arrayPool != null)
+            {
+                _arrayPool.RecycleArray(_tempPositionsArray);
+                _tempPositionsArray = null;
+            }
         }
-        _tempPositionsArray = null;
 
-        OnLinePositionsChanged?.Invoke();
-
-        if (newCount < 2)
+        private void OnDestroy()
         {
-            _isPlaying = false;
-            enabled = false;
-            OnAnimationCompleted?.Invoke();
+            if (_tempPositionsArray != null && _arrayPool != null)
+            {
+                _arrayPool.RecycleArray(_tempPositionsArray);
+                _tempPositionsArray = null;
+            }
         }
-    }
 
-    private void AnimateBackward()
-    {
-        var countCurrent = line.positionCount;
-        var countOrigin = positionsOrigin.Length;
-
-        if (countCurrent < countOrigin)
+        private void Update()
         {
-            var newCount = countCurrent + 1;
+            if (!line || line.positionCount < 2)
+            {
+                _isPlaying = false;
+                enabled = false;
+                OnAnimationStopped?.Invoke();
+                return;
+            }
+
+            if (_forward)
+                AnimateForward();
+            else
+                AnimateBackward();
+
+            ApplyVisualZOffset();
+        }
+
+        private void ApplyVisualZOffset()
+        {
+            if (Mathf.Abs(_visualZOffset) < 0.001f) return;
+
+            for (int i = 0; i < line.positionCount; i++)
+            {
+                Vector3 pos = line.GetPosition(i);
+                pos.z = _visualZOffset;
+                line.SetPosition(i, pos);
+            }
+        }
+
+        private void AnimateForward()
+        {
+            var count = line.positionCount;
+            var lastPoint = line.GetPosition(count - 1);
+
+            lastPoint += _direction.normalized * (speed * Time.deltaTime);
+            line.SetPosition(count - 1, lastPoint);
+
+            var tailPoint = line.GetPosition(0);
+            var tailDirection = line.GetPosition(1) - tailPoint;
+            tailPoint += tailDirection.normalized * (speed * Time.deltaTime);
+            line.SetPosition(0, tailPoint);
+
+            OnLinePositionsChanged?.Invoke();
+
+            if (!(Vector2.Distance(tailPoint, line.GetPosition(1)) < 0.1f)) return;
+
+
+            var newCount = count - 1;
             if (_arrayPool != null)
             {
                 _tempPositionsArray = _arrayPool.GetArray(newCount);
@@ -183,103 +163,114 @@ namespace _Game.Line
                 _tempPositionsArray = new Vector3[newCount];
             }
 
-            var indexTarget = countOrigin - newCount;
-            _tempPositionsArray[0] = positionsOrigin[indexTarget];
-            _tempPositionsArray[1] = positionsOrigin[indexTarget];
-            for (int i = 1; i < countCurrent; i++)
+            for (int i = 1; i < count; i++)
             {
-                _tempPositionsArray[i + 1] = line.GetPosition(i);
+                _tempPositionsArray[i - 1] = line.GetPosition(i);
             }
 
             line.positionCount = newCount;
             line.SetPositions(_tempPositionsArray);
-            
+
             if (_arrayPool != null)
             {
                 _arrayPool.RecycleArray(_tempPositionsArray);
             }
             _tempPositionsArray = null;
-            
-            OnLinePositionsChanged?.Invoke();
-            return;
-        }
 
-        bool allPositionsClose = true;
-        for (int i = 0; i < countCurrent && i < countOrigin; i++)
-        {
-            var currentPos = line.GetPosition(i);
-            var originPos = positionsOrigin[i];
-            if (Vector3.Distance(currentPos, originPos) > 0.1f)
+            OnLinePositionsChanged?.Invoke();
+
+            if (newCount < 2)
             {
-                allPositionsClose = false;
-                break;
+                _isPlaying = false;
+                enabled = false;
+                OnAnimationCompleted?.Invoke();
             }
         }
 
-        if (allPositionsClose && countCurrent == countOrigin)
+        private void AnimateBackward()
         {
-            line.SetPositions(positionsOrigin);
-            _isPlaying = false;
-            enabled = false;
-            OnLinePositionsChanged?.Invoke();
-            OnAnimationCompleted?.Invoke();
-            return;
-        }
+            int lastIndex = line.positionCount - 1;
+            Vector3 currentHeadPos = line.GetPosition(lastIndex);
+            Vector3 headMoveDir = -_direction.normalized;
+            Vector3 originHeadPos = positionsOrigin[positionsOrigin.Length - 1];
 
-        var positionHeadOrigin = positionsOrigin[positionsOrigin.Length - 1];
-        var indexHead = countCurrent - 1;
-        var positionHead = line.GetPosition(indexHead);
-        var directionToOrigin = positionHeadOrigin - positionHead;
-        
-        if (Vector3.Distance(positionHeadOrigin, positionHead) > 0.1f)
-        {
-            positionHead += directionToOrigin.normalized * (speed * Time.deltaTime);
-            
-            if (Vector3.Dot(directionToOrigin, positionHeadOrigin - positionHead) < 0)
+            float distToOrigin = Vector2.Distance(currentHeadPos, originHeadPos);
+            float moveDist = speed * Time.deltaTime;
+
+            Vector3 newHeadPos;
+
+            if (distToOrigin > 0.001f)
             {
-                positionHead = positionHeadOrigin;
-            }
-            
-            line.SetPosition(indexHead, positionHead);
-        }
-        else
-        {
-            line.SetPosition(indexHead, positionHeadOrigin);
-        }
+                Vector3 targetPos = originHeadPos;
+                targetPos.z = currentHeadPos.z;
 
-        var positionTail = line.GetPosition(0);
-        var positionTailTarget = positionsOrigin[0];
-        var directionTail = positionTailTarget - positionTail;
-
-        if (Vector3.Distance(positionTail, positionTailTarget) > 0.1f)
-        {
-            positionTail += directionTail.normalized * (speed * Time.deltaTime);
-            line.SetPosition(0, positionTail);
-        }
-        else
-        {
-            line.SetPosition(0, positionTailTarget);
-        }
-
-        for (int i = 1; i < countCurrent - 1 && i < countOrigin - 1; i++)
-        {
-            var currentPos = line.GetPosition(i);
-            var targetPos = positionsOrigin[i];
-            var dir = targetPos - currentPos;
-            
-            if (Vector3.Distance(currentPos, targetPos) > 0.1f)
-            {
-                currentPos += dir.normalized * (speed * Time.deltaTime);
-                line.SetPosition(i, currentPos);
+                newHeadPos = Vector3.MoveTowards(currentHeadPos, targetPos, moveDist);
+                line.SetPosition(lastIndex, newHeadPos);
             }
             else
             {
-                line.SetPosition(i, targetPos);
+                newHeadPos = originHeadPos;
+                line.SetPosition(lastIndex, originHeadPos);
+            }
+
+            int countCurrent = line.positionCount;
+            int countOrigin = positionsOrigin.Length;
+            int targetIndex = countOrigin - countCurrent;
+
+            if (targetIndex >= 0)
+            {
+                Vector3 currentTailPos = line.GetPosition(0);
+                Vector3 targetTailPos = positionsOrigin[targetIndex];
+
+                if (Vector2.Distance(currentTailPos, targetTailPos) > 0.1f)
+                {
+                    Vector3 newTailPos = Vector3.MoveTowards(currentTailPos, targetTailPos, speed * Time.deltaTime);
+
+                    newTailPos.z = currentTailPos.z;
+
+                    line.SetPosition(0, newTailPos);
+                }
+                else
+                {
+                    targetTailPos.z = currentTailPos.z;
+                    line.SetPosition(0, targetTailPos);
+
+                    if (targetIndex > 0)
+                    {
+                        int newCount = countCurrent + 1;
+                        if (_arrayPool != null)
+                            _tempPositionsArray = _arrayPool.GetArray(newCount);
+                        else
+                            _tempPositionsArray = new Vector3[newCount];
+
+                        _tempPositionsArray[0] = targetTailPos;
+
+                        for (int i = 0; i < countCurrent; i++)
+                        {
+                            _tempPositionsArray[i + 1] = line.GetPosition(i);
+                        }
+
+                        line.positionCount = newCount;
+                        line.SetPositions(_tempPositionsArray);
+
+                        if (_arrayPool != null)
+                        {
+                            _arrayPool.RecycleArray(_tempPositionsArray);
+                            _tempPositionsArray = null;
+                        }
+                    }
+                    else
+                    {
+                        if (Vector2.Distance(newHeadPos, originHeadPos) < 0.01f)
+                        {
+                            _isPlaying = false;
+                            enabled = false;
+                            OnAnimationCompleted?.Invoke();
+                        }
+                    }
+                }
+                OnLinePositionsChanged?.Invoke();
             }
         }
-
-        OnLinePositionsChanged?.Invoke();
     }
-
-}
 }
