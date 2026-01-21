@@ -158,8 +158,6 @@ A fully custom-built line architecture including:
 
 * 🎯 **Click to Activate**
   Click on any line to activate it.
-* ⏱️ **Timing Strategy**
-  Lines move at a constant speed — timing is critical.
 * 💥 **Avoid Collisions**
   Each collision costs one life.
 * ➡️ **Line Completion**
