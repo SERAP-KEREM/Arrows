@@ -1,6 +1,7 @@
 using SerapKeremGameKit._Singletons;
 using SerapKeremGameKit._Logging;
 using UnityEngine;
+using SerapKeremGameKit._UI;
 
 namespace SerapKeremGameKit._Camera
 {
@@ -19,6 +20,11 @@ namespace SerapKeremGameKit._Camera
 
         private Vector3 _initialPosition;
         private Quaternion _initialRotation;
+        private Bounds _boardBounds;
+        private bool _hasBoard;
+        private HUDPanel _hud;
+        private Rect _safeArea;
+        private int _screenWidth, _screenHeight;
 
         public void SnapFollow()
         {
@@ -100,17 +106,40 @@ namespace SerapKeremGameKit._Camera
                 return;
             }
 
-            Vector3 center = bounds.center;
+            _boardBounds = bounds;
+            _hasBoard = true;
+            if (_hud == null) _hud = FindFirstObjectByType<HUDPanel>(FindObjectsInactive.Include);
+            ApplyBoardFraming(cam);
+        }
+
+        private void LateUpdate()
+        {
+            if (!_hasBoard || _gameCamera == null) return;
+            if (_screenWidth != Screen.width || _screenHeight != Screen.height || _safeArea != Screen.safeArea)
+                ApplyBoardFraming(_gameCamera.GetComponent<Camera>());
+        }
+
+        private void ApplyBoardFraming(Camera cam)
+        {
+            if (cam == null || Screen.width <= 0 || Screen.height <= 0) return;
+            _safeArea = Screen.safeArea;
+            _screenWidth = Screen.width;
+            _screenHeight = Screen.height;
+            Rect pixels = _hud != null ? _hud.GetBoardScreenRect() : _safeArea;
+            var viewport = new Rect(pixels.x / Screen.width, pixels.y / Screen.height,
+                Mathf.Max(0.1f, pixels.width / Screen.width), Mathf.Max(0.1f, pixels.height / Screen.height));
+            Vector3 center = _boardBounds.center;
             center.z = _gameCamera.position.z;
-
-            _gameCamera.position = center;
-
             if (cam.orthographic)
             {
-                float orthographicSize = CalculateOrthographicSize(bounds, cam.aspect);
-                orthographicSize = Mathf.Clamp(orthographicSize, _minOrthographicSize, _maxOrthographicSize);
-                cam.orthographicSize = orthographicSize;
+                float width = _boardBounds.size.x + _padding * 2;
+                float height = _boardBounds.size.y + _padding * 2;
+                float size = Mathf.Max(width / (2 * cam.aspect * viewport.width), height / (2 * viewport.height));
+                cam.orthographicSize = Mathf.Clamp(size, _minOrthographicSize, _maxOrthographicSize);
+                center.x -= (viewport.center.x - 0.5f) * 2 * cam.orthographicSize * cam.aspect;
+                center.y -= (viewport.center.y - 0.5f) * 2 * cam.orthographicSize;
             }
+            _gameCamera.position = center;
         }
 
         private Bounds CalculateLinesBounds(Transform linesParent)
@@ -176,17 +205,6 @@ namespace SerapKeremGameKit._Camera
             return new Bounds(center, size);
         }
 
-        private float CalculateOrthographicSize(Bounds bounds, float aspectRatio)
-        {
-            float width = bounds.size.x + (_padding * 2f);
-            float height = bounds.size.y + (_padding * 2f);
-
-            float sizeByWidth = width / (2f * aspectRatio);
-            float sizeByHeight = height / 2f;
-
-            return Mathf.Max(sizeByWidth, sizeByHeight);
-        }
     }
 }
-
 

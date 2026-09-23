@@ -71,6 +71,20 @@ namespace _Game.Line
             _colorResetCoroutine = null;
         }
 
+        public void SetHintColor()
+        {
+            ResetToOriginalColors();
+            SetColor(new Color(0.05f, 0.65f, 0.55f));
+            _colorResetCoroutine = StartCoroutine(ResetHintColor());
+        }
+
+        private IEnumerator ResetHintColor()
+        {
+            yield return new WaitForSecondsRealtime(2f);
+            _colorResetCoroutine = null;
+            ResetToOriginalColors();
+        }
+
         public void ResetToOriginalColors()
         {
             if (_colorResetCoroutine != null)

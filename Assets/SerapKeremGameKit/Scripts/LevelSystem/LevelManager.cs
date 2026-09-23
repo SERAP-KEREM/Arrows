@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using SerapKeremGameKit._Logging;
 using SerapKeremGameKit._Utilities;
+using ArrowNook.Levels;
+using ArrowNook.Puzzles;
 
 namespace SerapKeremGameKit._Managers
 {
@@ -16,12 +18,9 @@ namespace SerapKeremGameKit._Managers
         private const string ProgressKey = PreferencesKeys.ProgressData;
         public int ActiveLevelNumber
         {
-            get => PlayerPrefs.GetInt(ProgressKey, 1);
-            set { PlayerPrefs.SetInt(ProgressKey, value); SaveUtility.SaveImmediate(); }
+            get => Mathf.Max(1, PlayerPrefs.GetInt(ProgressKey, 1));
+            set { PlayerPrefs.SetInt(ProgressKey, Mathf.Max(1, value)); SaveUtility.SaveImmediate(); }
         }
-
-        [Tooltip("Use random selection after tutorials are completed.")]
-        [SerializeField] private bool _useRandomSelection = true;
 
         [Title("Level Collections")]
         [ListDrawerSettings(Draggable = true, AlwaysExpanded = false)]
@@ -30,6 +29,7 @@ namespace SerapKeremGameKit._Managers
 
         public Level ActiveLevelInstance { get; private set; }
         public int ProcessedLevelIndex { get; private set; }
+        public bool IsGeneratedLevel { get; private set; }
 
         // Public accessors for external systems
         public Level[] GameplayLevels => _levels;
@@ -64,47 +64,25 @@ namespace SerapKeremGameKit._Managers
 
         public void LoadCurrentLevel()
         {
-            var selection = ComputeLevelSelection();
-            ProcessedLevelIndex = selection.targetIndex;
-            InstantiateAndBegin(selection.selectedLevel);
-        }
-
-        private (Level selectedLevel, int targetIndex) ComputeLevelSelection()
-        {
-            int currentProgress = ActiveLevelNumber;
-            return ResolveGameplaySelection(currentProgress);
-        }
-
-        private (Level selectedLevel, int targetIndex) ResolveGameplaySelection(int adjustedProgress)
-        {
-            int totalGameplayLevels = _levels.Length;
-            int calculatedIndex = ClampOrWrapIndex(adjustedProgress, totalGameplayLevels);
-
-            return (_levels[calculatedIndex - 1], calculatedIndex);
-        }
-
-        private int ClampOrWrapIndex(int progressValue, int totalAvailable)
-        {
-            if (progressValue <= totalAvailable)
-                return progressValue;
-
-            if (_useRandomSelection)
-                return GetRandomIndex(totalAvailable);
-
-            return WrapIndex(progressValue, totalAvailable);
-        }
-
-        private int GetRandomIndex(int maxRange) => Random.Range(1, maxRange + 1);
-
-        private int WrapIndex(int value, int wrapLimit)
-        {
-            int remainder = value % wrapLimit;
-            return remainder == 0 ? wrapLimit : remainder;
+            int number = ActiveLevelNumber;
+            Level authored = number <= PuzzleGenerator.AuthoredLevelCount ? GetLevelByNumber(number) : null;
+            IsGeneratedLevel = authored == null;
+            Level template = IsGeneratedLevel ? Resources.Load<Level>("Levels/Level_Base") : authored;
+            if (template == null)
+            {
+                TraceLogger.LogError("The generated level template is missing.", this);
+                return;
+            }
+            TerminateCurrentLevel();
+            ProcessedLevelIndex = number;
+            InstantiateAndBegin(template);
         }
 
         private void InstantiateAndBegin(Level targetLevel)
         {
             ActiveLevelInstance = Instantiate(targetLevel);
+            if (IsGeneratedLevel)
+                ProceduralLevelBuilder.Populate(ActiveLevelInstance, PuzzleGenerator.Generate(ActiveLevelNumber));
             ActiveLevelInstance.Load();
             Time.timeScale = 1f;
             if (SerapKeremGameKit._InputSystem.InputHandler.Instance != null)
@@ -132,9 +110,7 @@ namespace SerapKeremGameKit._Managers
 
         public void RetryLevel()
         {
-            TerminateCurrentLevel();
-            var retryTarget = _levels[ProcessedLevelIndex - 1];
-            InstantiateAndBegin(retryTarget);
+            LoadCurrentLevel();
         }
 
         public void RestartLevel()
@@ -153,14 +129,18 @@ namespace SerapKeremGameKit._Managers
         public void IncreaseLevelNumber()
         {
             TerminateCurrentLevel();
-            ActiveLevelNumber++;
+            ActiveLevelNumber = ActiveLevelNumber == int.MaxValue ? PuzzleGenerator.AuthoredLevelCount + 1 : ActiveLevelNumber + 1;
         }
 
         private void TerminateCurrentLevel()
         {
             // notify state if needed
             if (ActiveLevelInstance != null)
+            {
+                ActiveLevelInstance.gameObject.SetActive(false);
                 Destroy(ActiveLevelInstance.gameObject);
+                ActiveLevelInstance = null;
+            }
         }
 
         #endregion
@@ -233,7 +213,7 @@ namespace SerapKeremGameKit._Managers
         {
             int gameplayIndex = levelNumber;
 
-            if (gameplayIndex <= 0 || gameplayIndex > _levels.Length) return null;
+            if (_levels == null || gameplayIndex <= 0 || gameplayIndex > _levels.Length) return null;
 
             return _levels[gameplayIndex - 1];
         }

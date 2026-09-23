@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using SerapKeremGameKit._Logging;
 using TriInspector;
 
@@ -20,6 +21,69 @@ namespace _Game.Line
 
     public IReadOnlyList<Line> ActiveLines => _activeLines;
     public Vector3ArrayPool Vector3ArrayPool => _vector3ArrayPool;
+
+    private readonly List<RaycastHit2D> _hintHits = new();
+
+    public bool HasMovingLines
+    {
+        get
+        {
+            foreach (Line line in _activeLines)
+            {
+                if (line != null && line.Animation != null && line.Animation.IsPlaying) return true;
+            }
+            return false;
+        }
+    }
+
+    public bool TryGetHint(out Line hint)
+    {
+        hint = null;
+        if (HasMovingLines) return false;
+
+        Physics2D.SyncTransforms();
+        PhysicsScene2D physicsScene = gameObject.scene.GetPhysicsScene2D();
+        var filter = new ContactFilter2D { useTriggers = true };
+        foreach (Line candidate in _activeLines)
+        {
+            if (candidate == null || !candidate.IsClickable || !candidate.gameObject.activeInHierarchy) continue;
+            LineRenderer renderer = candidate.LineRenderer;
+            CircleCollider2D head = candidate.HeadCollider;
+            if (renderer == null || renderer.positionCount < 2 || head == null) continue;
+
+            int last = renderer.positionCount - 1;
+            Vector3 origin = renderer.GetPosition(last);
+            Vector3 direction = candidate.Animation.Direction;
+            if (!renderer.useWorldSpace)
+            {
+                origin = renderer.transform.TransformPoint(origin);
+                direction = renderer.transform.TransformVector(direction);
+            }
+            if (((Vector2)direction).sqrMagnitude < 0.0001f) continue;
+
+            Vector3 scale = head.transform.lossyScale;
+            float radius = head.radius * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.y));
+            origin += head.transform.TransformVector(head.offset);
+            _hintHits.Clear();
+            physicsScene.CircleCast(origin, radius, ((Vector2)direction).normalized, Mathf.Infinity, filter, _hintHits);
+
+            bool blocked = false;
+            foreach (RaycastHit2D hit in _hintHits)
+            {
+                Line other = hit.collider.GetComponentInParent<Line>();
+                if (other != null && other != candidate)
+                {
+                    blocked = true;
+                    break;
+                }
+            }
+            if (blocked) continue;
+
+            hint = candidate;
+            return true;
+        }
+        return false;
+    }
 
     public event Action OnAllLinesRemoved;
 
@@ -90,7 +154,7 @@ namespace _Game.Line
     {
         if (line == null) return;
 
-        _activeLines.Remove(line);
+        if (!_activeLines.Remove(line)) return;
 
         if (_activeLines.Count == 0)
         {

@@ -73,6 +73,10 @@ mono_crash.*
 *.unitypackage.meta
 *.app
 
+# Local release secrets. Keep real ad IDs out of source control.
+/[Aa]ssets/_Game/Resources/Secrets/AdMobIds.json
+/[Aa]ssets/_Game/Resources/Secrets/AdMobIds.json.meta
+
 # Crashlytics generated file
 crashlytics-build.properties
 

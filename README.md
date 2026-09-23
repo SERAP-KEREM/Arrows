@@ -221,7 +221,10 @@ git clone https://github.com/SERAP-KEREM/Arrows.git
 
 ---
 
+## Development Notes
+
+The proposed ArrowNook name, competitor research, and prioritized product work are in [docs/market-research.md](docs/market-research.md). New hint and input improvements require the [Unity and Android verification checks](docs/verification.md) before release.
+
 ## 📜 **License**
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/SERAP-KEREM/SERAP-KEREM/blob/main/MIT%20License.txt) file for details.
-

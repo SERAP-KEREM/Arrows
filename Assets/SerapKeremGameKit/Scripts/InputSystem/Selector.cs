@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using TriInspector;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using SerapKeremGameKit._Logging;
 using SerapKeremGameKit._InputSystem.Data;
 
@@ -16,12 +18,18 @@ namespace SerapKeremGameKit._InputSystem
         [SerializeField] private LayerMask _selectableLayerMash;
         [SerializeField, Range(10f, 1000f)] private float _raycastDistance = 500f;
         [SerializeField] private bool _use2DColliders = true;
+        [SerializeField, Min(1f)] private float _tapSlop = 16f;
 
         [Header("Debug")]
         [SerializeField] private bool _enableDebugRay = true;
 
         [Header("Camera")]
         [SerializeField, ReadOnly] private Camera _mainCamera;
+
+        private readonly List<RaycastResult> _uiHits = new();
+        private ISelectable _pressedSelectable;
+        private Vector3 _pressPosition;
+        private bool _selectOnRelease;
 
         //[Header("Audio")]
         // Integrate with your AudioManager if desired later
@@ -32,12 +40,18 @@ namespace SerapKeremGameKit._InputSystem
             ValidateReferences();
         }
 
-        private void Update()
+        private void LateUpdate()
         {
-            if (_playerInputSO == null) return;
+            if (_playerInputSO == null || _mainCamera == null ||
+                (InputHandler.IsInitialized && InputHandler.Instance.IsInputLocked))
+            {
+                _pressedSelectable = null;
+                return;
+            }
             if (_playerInputSO.DownThisFrame) HandleSelectStart(_playerInputSO.MousePosition);
-            else if (_playerInputSO.Held) HandleDrag(_playerInputSO.MousePosition);
             else if (_playerInputSO.UpThisFrame) HandleRelease(_playerInputSO.MousePosition);
+            else if (_playerInputSO.Held) HandleDrag(_playerInputSO.MousePosition);
+            else _pressedSelectable = null;
         }
 
         private void ValidateReferences()
@@ -51,6 +65,8 @@ namespace SerapKeremGameKit._InputSystem
 
         private void HandleSelectStart(Vector3 screenPos)
         {
+            _pressedSelectable = null;
+            _pressPosition = screenPos;
             if (IsPointerOverUI()) return;
 
             if (_use2DColliders)
@@ -131,10 +147,12 @@ namespace SerapKeremGameKit._InputSystem
 
         private void ProcessSelection(ISelectable selectable, Vector3 worldPosition)
         {
-            if (selectable != null)
+            if (_selectOnRelease)
             {
-                selectable.OnSelected(worldPosition);
+                if (selectable != null && ReferenceEquals(selectable, _pressedSelectable))
+                    selectable.OnSelected(worldPosition);
             }
+            else _pressedSelectable = selectable;
         }
 
         private void DrawDebugRay2D(Vector3 worldPos, Color color)
@@ -147,36 +165,39 @@ namespace SerapKeremGameKit._InputSystem
 
         private void HandleDrag(Vector3 screenPos)
         {
-            //if (!IsGamePlayable()) return;
-            if (IsPointerOverUI()) return;
-
-            Ray ray = _mainCamera.ScreenPointToRay(screenPos);
-
-            if (Physics.Raycast(ray, out var hit, _raycastDistance, _selectableLayerMash))
-            {
-                if (hit.collider)
-                {
-                 
-                }
-
-                DrawDebugRay(ray, hit.distance, Color.green);
-            }
-            else
-            {
-                DrawDebugRay(ray, _raycastDistance, Color.red);
-            }
+            float slop = _tapSlop * (Screen.dpi > 0f ? Mathf.Clamp(Screen.dpi / 160f, 1f, 3f) : 1f);
+            if ((screenPos - _pressPosition).sqrMagnitude > slop * slop || IsPointerOverUI())
+                _pressedSelectable = null;
         }
 
         private void HandleRelease(Vector3 screenPos)
         {
-           
+            HandleDrag(screenPos);
+            if (_pressedSelectable == null) return;
+
+            // A drag or a release on a different arrow must never spend a life.
+            _selectOnRelease = true;
+            if (_use2DColliders) Handle2DSelection(screenPos);
+            else Handle3DSelection(screenPos);
+            _selectOnRelease = false;
+            _pressedSelectable = null;
         }
+
+        private void OnDisable() => _pressedSelectable = null;
 
         //private bool IsGamePlayable() => StateManager.Instance.CurrentState == GameState.OnStart;
 
         private bool IsPointerOverUI()
         {
-            return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+            if (EventSystem.current == null) return false;
+            var pointer = new PointerEventData(EventSystem.current) { position = _playerInputSO.MousePosition };
+            _uiHits.Clear();
+            EventSystem.current.RaycastAll(pointer, _uiHits);
+            foreach (RaycastResult hit in _uiHits)
+            {
+                if (hit.module is GraphicRaycaster) return true;
+            }
+            return false;
         }
 
         private void DrawDebugRay(Ray ray, float distance, Color color)

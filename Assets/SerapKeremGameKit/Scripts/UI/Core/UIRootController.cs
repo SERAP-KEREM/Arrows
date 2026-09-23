@@ -7,6 +7,8 @@ using UnityEngine;
 using SerapKeremGameKit._Audio;
 using SerapKeremGameKit._Haptics;
 using _Game.UI;
+using ArrowNook.Ads;
+using ArrowNook.PlayServices;
 
 namespace SerapKeremGameKit._UI
 {
@@ -23,6 +25,10 @@ namespace SerapKeremGameKit._UI
         [SerializeField] private LevelConfig _fallbackConfig;
 
         private GameState _lastState = GameState.None;
+        private ResultsBannerController _ads;
+        private InterstitialAdController _interstitialAds;
+        private PlayReviewController _playReview;
+        private PlayUpdateController _playUpdates;
 
         [Header("Audio Keys")]
         [SerializeField] private string _keyOnWin = "game_win";
@@ -34,6 +40,10 @@ namespace SerapKeremGameKit._UI
 
         private void Awake()
         {
+            _ads = gameObject.AddComponent<ResultsBannerController>();
+            _interstitialAds = gameObject.AddComponent<InterstitialAdController>();
+            _playReview = gameObject.AddComponent<PlayReviewController>();
+            _playUpdates = gameObject.AddComponent<PlayUpdateController>();
             // Auto-wire if not assigned
             if (_hud == null) _hud = GetComponentInChildren<HUDPanel>(true);
             if (_win == null) _win = GetComponentInChildren<WinPanel>(true);
@@ -111,6 +121,7 @@ namespace SerapKeremGameKit._UI
 
         private void HideAll()
         {
+            _ads.EndResults();
             if (_hud != null) _hud.Hide(false);
             if (_win != null) _win.Hide(false);
             if (_fail != null) _fail.Hide(false);
@@ -134,6 +145,7 @@ namespace SerapKeremGameKit._UI
                     totalBefore = CurrencyWallet.Instance.Coins;
                 }
                 _win.Setup(stars, reward, totalBefore, this);
+                _ads.BeginResults(_win.transform as RectTransform, LevelManager.Instance.ActiveLevelNumber);
                 _win.Show();
             }
         }
@@ -189,6 +201,7 @@ namespace SerapKeremGameKit._UI
 
         private void HideExcept(UIPanel screen)
         {
+            _ads.EndResults();
             if (_hud != null && _hud != screen) _hud.Hide(true);
             if (_win != null && _win != screen) _win.Hide(true);
             if (_fail != null && _fail != screen) _fail.Hide(true);
@@ -239,11 +252,25 @@ namespace SerapKeremGameKit._UI
             {
                 CurrencyWallet.Instance.Add(reward);
             }
-            OnNextLevelRequested();
+
+            int completedLevelNumber = LevelManager.Instance.ActiveLevelNumber;
+            void ContinueWithInterstitial()
+            {
+                if (_interstitialAds != null)
+                    _interstitialAds.OnLevelComplete(completedLevelNumber, OnNextLevelRequested);
+                else
+                    OnNextLevelRequested();
+            }
+
+            if (_playReview != null && _playReview.TryRequestReview(completedLevelNumber, OnNextLevelRequested))
+                return;
+
+            ContinueWithInterstitial();
         }
 
         public void OnOpenSettings()
         {
+            _ads.EndResults();
             if (_settings != null) _settings.Show();
             if (AudioManager.IsInitialized && !string.IsNullOrEmpty(_keyOnOpenSettings)) AudioManager.Instance.Play(_keyOnOpenSettings);
             if (HapticManager.IsInitialized) HapticManager.Instance.Play(HapticType.Selection);

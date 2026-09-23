@@ -17,6 +17,12 @@ namespace SerapKeremGameKit._InputSystem.Data
             UpThisFrame = false;
         }
 
+        public void Cancel()
+        {
+            ResetFrame();
+            Held = false;
+        }
+
         public void SetMouseDown(Vector3 position)
         {
             MousePosition = position;

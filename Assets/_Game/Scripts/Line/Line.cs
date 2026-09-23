@@ -27,7 +27,8 @@ namespace _Game.Line
         public LineAnimation Animation => _animation;
         public LineClick Click => _click;
         public bool IsInitialized { get; private set; }
-        public bool IsClickable => !_hasCollided && (_animation == null || !_animation.IsPlaying || (_animation.IsPlaying && _animation.IsForward));
+        public bool IsClickable => IsInitialized && !_hasCollided && _animation != null && !_animation.IsPlaying;
+        public CircleCollider2D HeadCollider => _lineHead != null ? _lineHead.GetComponent<CircleCollider2D>() : null;
 
         private LineManager _lineManager;
         private Vector3ArrayPool _arrayPool;
@@ -157,6 +158,7 @@ namespace _Game.Line
             if (_animation != null)
             {
                 _animation.OnLinePositionsChanged += HandleLinePositionsChanged;
+                _animation.OnForwardCollision += HandleHeadCollision;
                 _animation.OnAnimationStarted += HandleAnimationStarted;
                 _animation.OnAnimationStopped += HandleAnimationStopped;
                 _animation.OnAnimationCompleted += HandleAnimationCompleted;
@@ -168,6 +170,7 @@ namespace _Game.Line
             if (_animation != null)
             {
                 _animation.OnLinePositionsChanged -= HandleLinePositionsChanged;
+                _animation.OnForwardCollision -= HandleHeadCollision;
                 _animation.OnAnimationStarted -= HandleAnimationStarted;
                 _animation.OnAnimationStopped -= HandleAnimationStopped;
                 _animation.OnAnimationCompleted -= HandleAnimationCompleted;
@@ -177,6 +180,7 @@ namespace _Game.Line
 
         private void HandleLinePositionsChanged()
         {
+            if (_lineHead != null) _lineHead.SyncPosition();
             if (_colliderSpawner != null)
             {
                 _colliderSpawner.UpdateSegments();
@@ -187,6 +191,7 @@ namespace _Game.Line
         {
             if (forwardDirection)
             {
+                if (_materialHandler != null) _materialHandler.ResetToOriginalColors();
                 _hasCollided = false;
                 _hasLostLifeForThisCollision = false;
                 if (_animation != null) _animation.VisualZOffset = 0f;
@@ -232,11 +237,18 @@ namespace _Game.Line
             {
                 _lineManager.UnregisterLine(this);
             }
+            gameObject.SetActive(false);
+            Destroy(gameObject);
+        }
+
+        public void ShowHint()
+        {
+            if (IsClickable && _materialHandler != null) _materialHandler.SetHintColor();
         }
 
         private void HandleHeadCollision(Collider2D other)
         {
-            if (_hasCollided) return;
+            if (_hasCollided || _animation == null || !_animation.IsPlaying || !_animation.IsForward) return;
             ReverseLine();
         }
 
@@ -253,6 +265,7 @@ namespace _Game.Line
             if (_animation != null)
             {
                 _animation.Stop();
+                _hasCollided = true;
                 _animation.VisualZOffset = -1f;
                 _animation.Play(forwardDirection: false);
             }

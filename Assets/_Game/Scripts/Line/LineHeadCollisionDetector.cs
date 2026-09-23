@@ -31,9 +31,16 @@ namespace _Game.Line
             CheckCollision(other);
         }
 
+        private void OnTriggerStay2D(Collider2D other)
+        {
+            if (!_isInitialized || _ownLine == null || _hasCollided) return;
+            CheckCollision(other);
+        }
+
         private void CheckCollision(Collider2D other)
         {
             if (other == null || _hasCollided) return;
+            if (_ownLine.Animation == null || !_ownLine.Animation.IsPlaying || !_ownLine.Animation.IsForward) return;
 
             Line otherLine = GetLineFromCollider(other);
             if (otherLine == null || otherLine == _ownLine)
@@ -49,12 +56,7 @@ namespace _Game.Line
         {
             if (collider == null) return null;
 
-            Line line = collider.GetComponent<Line>();
-            if (line == null && collider.transform.parent != null)
-            {
-                line = collider.transform.parent.GetComponent<Line>();
-            }
-            return line;
+            return collider.GetComponentInParent<Line>();
         }
 
         public void ResetCollision()

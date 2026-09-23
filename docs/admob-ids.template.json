@@ -1,0 +1,10 @@
+{
+  "androidAppId": "ca-app-pub-XXXXXXXXXXXXXXXX~NNNNNNNNNN",
+  "androidBannerUnitId": "ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN",
+  "androidInterstitialUnitId": "ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN",
+  "iosAppId": "",
+  "iosBannerUnitId": "",
+  "iosInterstitialUnitId": "",
+  "forceNonPersonalizedAds": true,
+  "tagForUnderAgeOfConsent": true
+}

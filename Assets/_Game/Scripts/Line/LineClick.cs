@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 using SerapKeremGameKit._InputSystem;
+using SerapKeremGameKit._LevelSystem;
+using SerapKeremGameKit._Managers;
 
 namespace _Game.Line
 {
@@ -71,13 +73,16 @@ namespace _Game.Line
 
     public void OnSelected(Vector3 worldPosition)
     {
+        if (!StateManager.IsInitialized || StateManager.Instance.CurrentState != GameState.OnStart ||
+            (InputHandler.IsInitialized && InputHandler.Instance.IsInputLocked))
+            return;
+
         if (!_isInitialized || _animation == null || _lineDestroyer == null)
             return;
 
         if (_ownLine != null && !_ownLine.IsClickable)
             return;
         
-        _lineDestroyer.StartCountdown();
         _animation.Play(forwardDirection: true);
     }
     }

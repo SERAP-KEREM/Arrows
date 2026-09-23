@@ -16,12 +16,13 @@ namespace SerapKeremGameKit._UI
 
         private void OnEnable()
         {
-            if (_soundToggle != null) _soundToggle.isOn = PlayerPrefs.GetInt(SoundKey, 1) == 1;
-            if (_hapticToggle != null) _hapticToggle.isOn = PlayerPrefs.GetInt(HapticKey, 1) == 1;
+            if (_soundToggle != null) _soundToggle.SetIsOnWithoutNotify(PlayerPrefs.GetInt(SoundKey, 1) == 1);
+            if (_hapticToggle != null) _hapticToggle.SetIsOnWithoutNotify(PlayerPrefs.GetInt(HapticKey, 1) == 1);
         }
 
 		private void Awake()
 		{
+			ArrowNook.UI.SettingsCredits.Attach(this, _closeButton);
 			if (_soundToggle != null) _soundToggle.onValueChanged.AddListener(OnSoundToggled);
 			if (_hapticToggle != null) _hapticToggle.onValueChanged.AddListener(OnHapticToggled);
 			if (_closeButton != null) _closeButton.BindOnClick(this, OnCloseClicked);

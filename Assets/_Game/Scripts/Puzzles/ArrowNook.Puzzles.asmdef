@@ -1,0 +1,7 @@
+{
+  "name": "ArrowNook.Puzzles",
+  "rootNamespace": "ArrowNook.Puzzles",
+  "references": [],
+  "autoReferenced": true,
+  "noEngineReferences": true
+}

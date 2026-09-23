@@ -140,6 +140,7 @@ public class LineSegmentColliderSpawner2D : MonoBehaviour
         foreach (var go in _spawnedSegments)
         {
             if (!go) continue;
+            go.SetActive(false);
 
 #if UNITY_EDITOR
             if (!Application.isPlaying)
@@ -163,6 +164,7 @@ public class LineSegmentColliderSpawner2D : MonoBehaviour
             
             if (child.name.Contains("Clone") || child.name.Contains("Segment") || child.GetComponent<Collider2D>() != null)
             {
+                child.gameObject.SetActive(false);
 #if UNITY_EDITOR
                 if (!Application.isPlaying)
                     DestroyImmediate(child.gameObject);

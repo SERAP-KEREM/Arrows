@@ -1,0 +1,25 @@
+ArrowNook: Logic Puzzle
+Made with love in India by Anupam Pradhan, a solo developer.
+
+ArrowNook-specific additions and modifications:
+Copyright (c) 2026 Anupam Pradhan.
+
+Original game and framework: Arrows / SerapKeremGameKit by Serap Kerem.
+Source: https://github.com/SERAP-KEREM/Arrows
+Original license referenced by that project's README:
+https://github.com/SERAP-KEREM/SERAP-KEREM/blob/main/MIT%20License.txt
+
+MIT License
+Copyright (c) 2024 Serap Kerem
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Engine
+This game was made with Unity. ArrowNook: Logic Puzzle is not sponsored by or affiliated with Unity Technologies or its affiliates. Unity and the Unity logo are trademarks or registered trademarks of Unity Technologies or its affiliates in the U.S. and elsewhere.
+
+Other dependencies
+Google Mobile Ads for Unity and the External Dependency Manager for Unity: Google LLC, Apache License 2.0. Unity packages, TextMesh Pro, DOTween, Tri Inspector, UI Particle, bundled fonts, audio and art retain their respective owners and licenses. Original third-party notices are retained in the source distribution. No ownership of these third-party assets is claimed by the ArrowNook developer.

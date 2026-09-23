@@ -1,0 +1,20 @@
+ArrowNook: Logic Puzzle
+Privacy Notice
+
+Developer: Anupam Pradhan, India
+
+ArrowNook stores your level number, coins, sound preference and haptic preference on your device. The game does not include an account system and does not upload your puzzle progress to an ArrowNook server.
+
+ArrowNook uses Google Mobile Ads and Google's User Messaging Platform to show ads, manage consent where required, limit ad content to a general-audience rating, and provide privacy choices where Google's consent system requires them. Google may process device, network, advertising ID, app interaction, diagnostic and ad interaction data according to Google's policies.
+
+The game requests non-personalized ads by default. Non-personalized ads still require data processing by Google and its partners. Network failure or unavailable consent leaves the core puzzle game playable without ads.
+
+When Google's consent system requires a privacy-options entry, Privacy choices is available in Settings. Interstitial ads, when available, are limited to natural level-transition moments. Hints are not paid.
+
+ArrowNook may use Google Play services to show an in-app review prompt and offer an in-app update when a newer version is available. These flows are provided by Google Play and follow Google's privacy policy.
+
+Google privacy information:
+https://policies.google.com/privacy
+https://support.google.com/admob/answer/9012903
+
+The public privacy policy URL submitted in Google Play Console is the controlling hosted policy for store distribution. You can contact the developer using the support email shown on the Google Play listing.
